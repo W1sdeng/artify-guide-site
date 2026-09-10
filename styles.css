@@ -439,10 +439,11 @@ html.js .hero__title .char { display: inline-block; opacity: 0; transform: trans
 }
 
 /* ---- 识宝：照片 -> 识别 -> 描边 -> 抠图 -> 说明 -> 藏宝阁 ---- */
-.shibao { width: min(100%, 480px); }
+/* 竖屏手机比例：底部讲解卡才能长到接近整屏，看得清动画也读得全文字 */
+.shibao { width: min(100%, 430px); }
 .shibao__stage {
   position: relative;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 1000 / 1780;
   border: 2px solid var(--ink);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-lg);
@@ -462,7 +463,7 @@ html.js .hero__title .char { display: inline-block; opacity: 0; transform: trans
 /* 抠图区：位置与展厅照里画作的位置严格对齐（352,132,560,700 / 1200x900） */
 .shibao__cutwrap {
   position: absolute;
-  left: 29.333%; top: 14.667%; width: 46.667%; height: 77.778%;
+  left: 17.6%; top: 18.539%; width: 64.8%; height: 45.506%;
   transform-origin: 88% 4%;
   transition: transform .6s var(--ease-spring), opacity .45s var(--ease-out), filter .45s var(--ease-out);
 }
@@ -476,7 +477,7 @@ html.js .hero__title .char { display: inline-block; opacity: 0; transform: trans
 /* 存进藏宝阁：主体留在原处，飞一个副本过去 */
 .shibao__fly {
   position: absolute;
-  left: 29.333%; top: 14.667%; width: 46.667%; height: 77.778%;
+  left: 17.6%; top: 18.539%; width: 64.8%; height: 45.506%;
   object-fit: contain;
   opacity: 0; pointer-events: none;
   transform-origin: 88% 4%;
@@ -559,8 +560,8 @@ html.js .hero__title .char { display: inline-block; opacity: 0; transform: trans
 /* 底部讲解卡：内容与 App 的分段一致，长卡从下往上滑出，内部可滚 */
 .shibao__sheet {
   position: absolute; left: 0; right: 0; bottom: 0;
-  max-height: 84%;
-  padding: 16px 18px 20px;
+  max-height: 88%;
+  padding: 18px 20px 24px;
   background: var(--paper);
   border-top: 2px solid var(--ink);
   border-radius: 16px 16px 0 0;

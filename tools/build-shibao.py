@@ -25,11 +25,12 @@ ASSETS = os.path.join(ROOT, "assets")
 BACKDROP_DIR = r"D:\ArtsGuide\backgrounds"
 KEYWORD = "Water Lilies"
 
-SCENE_W, SCENE_H = 1200, 900
+# 竖屏（手机拍照的比例），这样底部讲解卡可以长到接近整屏
+SCENE_W, SCENE_H = 1000, 1780
 # 画作在展厅照里的位置与尺寸（不含画框）
-PAINT = (352, 132, 560, 700)          # left, top, w, h  —— 比例 0.8
-FRAME_W = 26                          # 外框宽度
-LINER_W = 9                           # 内衬宽度
+PAINT = (176, 330, 648, 810)          # left, top, w, h —— 比例 0.8，与抠图一致
+FRAME_W = 28                          # 外框宽度
+LINER_W = 10                          # 内衬宽度
 CUT_W, CUT_H = 760, 950               # 抠图导出尺寸（同比例 0.8）
 
 random.seed(7)
@@ -108,10 +109,10 @@ def build() -> None:
     wall = ImageEnhance.Brightness(wall).enhance(1.0).filter(ImageFilter.GaussianBlur(0.6))
 
     # 左边缘：旁边另一幅画的一角（虚化、压暗）
-    nb = fit(src, 260, 380)
-    nb = ImageEnhance.Brightness(nb).enhance(0.78)
-    nb = nb.filter(ImageFilter.GaussianBlur(2.2))
-    wall.paste(nb, (-150, 300))
+    nb = fit(src, 240, 500)
+    nb = ImageEnhance.Brightness(nb).enhance(0.76)
+    nb = nb.filter(ImageFilter.GaussianBlur(2.4))
+    wall.paste(nb, (-140, 620))
 
     px, py, pw, ph = PAINT
 
@@ -133,8 +134,8 @@ def build() -> None:
     # 画作贴入
     wall.paste(painting.resize((pw, ph), Image.LANCZOS), (px, py))
 
-    # 展签（画框左下，避开前景行人）
-    lx, ly = px - o - 122, py + ph - 54
+    # 展签（画框左下方，避开前景行人）
+    lx, ly = 56, py + ph + o + 28
     wd.rectangle((lx, ly, lx + 96, ly + 66), fill=(232, 228, 219))
     wd.rectangle((lx, ly, lx + 96, ly + 66), outline=(150, 142, 130), width=1)
     for i in range(4):
@@ -144,8 +145,8 @@ def build() -> None:
     # 前景行人剪影（虚化的头+肩，压在画面右下角）
     person = Image.new("RGBA", (SCENE_W, SCENE_H), (0, 0, 0, 0))
     pd = ImageDraw.Draw(person)
-    pd.ellipse((862, 612, 1006, 760), fill=(26, 24, 26, 255))          # 头
-    pd.rounded_rectangle((790, 736, 1090, 1040), radius=120, fill=(24, 22, 24, 255))  # 肩
+    pd.ellipse((686, 1028, 832, 1174), fill=(26, 24, 26, 255))            # 头（压住画面右下角）
+    pd.rounded_rectangle((576, 1152, 950, 1610), radius=150, fill=(24, 22, 24, 255))  # 肩
     person = person.filter(ImageFilter.GaussianBlur(9))
     wall = Image.alpha_composite(wall.convert("RGBA"), person).convert("RGB")
 
