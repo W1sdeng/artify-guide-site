@@ -211,7 +211,20 @@ html.js .hero__title .char { display: inline-block; opacity: 0; transform: trans
   transition-delay: calc(var(--ci) * 45ms);
 }
 .hero__sub { margin-top: 24px; max-width: 40ch; font-size: 17px; color: var(--ink); }
-.hero__actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 32px; }
+/* 首屏左侧的三条实测说明：把空白填实，也是这个 App 最简洁的解释 */
+.hero__facts { margin-top: 24px; display: grid; gap: 10px; max-width: 46ch; }
+.hero__facts li {
+  position: relative; padding-left: 22px;
+  font-size: 14.5px; line-height: 1.68; color: var(--ink-2);
+}
+.hero__facts li::before {
+  content: ""; position: absolute; left: 0; top: .62em;
+  width: 9px; height: 9px; margin-top: -4px;
+  background: var(--lime); border: 2px solid var(--ink); border-radius: 2px;
+}
+.hero__facts b { color: var(--ink); font-weight: 700; }
+
+.hero__actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 30px; }
 .hero__version { margin-top: 20px; font-family: var(--font-num); font-size: 14px; letter-spacing: .04em; color: var(--ink-2); }
 
 .hero__media { display: flex; justify-content: center; }
@@ -360,7 +373,8 @@ html.js .hero__title .char { display: inline-block; opacity: 0; transform: trans
   border: 2px solid var(--ink); border-radius: var(--radius-card);
   box-shadow: var(--shadow-lg); overflow: hidden; background: var(--paper-2);
 }
-.shot img { width: 100%; height: auto; }
+/* 只作用于直接子图：识宝/藏宝阁里的图是嵌套的，不能被这条规则改掉高度 */
+.shot > img { width: 100%; height: auto; }
 
 /* 功能区块：图文分开做，别整块一起淡入 */
 .feature__media > * {
@@ -438,165 +452,229 @@ html.js .hero__title .char { display: inline-block; opacity: 0; transform: trans
   50%      { opacity: 1;  transform: translateY(-3px); }
 }
 
-/* ---- 识宝：照片 -> 识别 -> 描边 -> 抠图 -> 说明 -> 藏宝阁 ---- */
-/* 一整块「手机屏」：上半是识别画面（永不被遮），下半是滑入的讲解卡 */
-.shibao { width: min(100%, 440px); }
-.shibao__screen {
-  border: 2px solid var(--ink);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-lg);
-  overflow: hidden;
-  background: var(--paper-2);
-}
-.shibao__stage {
+/* ---- 识宝：手机屏 UI（与其他截图同尺寸同比例） ---- */
+.shibao { position: relative; }
+.sb {
   position: relative;
-  aspect-ratio: 1200 / 900;
+  aspect-ratio: 1080 / 2400;
   overflow: hidden;
-  border-bottom: 2px solid var(--ink);
+  background: var(--ink);
 }
-.shibao__scene { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-
-/* 抠图完成时压暗背景，把注意力交给抠出来的画 */
-.shibao__scrim {
+/* 背景：同一张展厅照放大 + 高斯模糊，把注意力交给中间的清晰区 */
+.sb__bg {
   position: absolute; inset: 0;
-  background: rgba(37, 37, 39, .38);
-  opacity: 0; transition: opacity .5s var(--ease-out);
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transform: scale(1.28);
+  filter: blur(16px) saturate(.85) brightness(.7);
 }
-.shibao.is-cutting .shibao__scrim { opacity: 1; }
 
-/* 抠图区：位置与展厅照里画作的位置严格对齐（352,132,560,700 / 1200x900） */
-.shibao__cutwrap {
+/* 中间的清晰取景区：识别、描边、抠图都在这里发生 */
+.sb__view {
+  position: absolute; left: 50%; top: 40%;
+  width: 80%;
+  aspect-ratio: 1200 / 900;
+  transform: translate(-50%, -50%);
+  overflow: hidden;
+  border: 2px solid var(--paper);
+  border-radius: 10px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, .38);
+  transition: top .62s var(--ease-spring), box-shadow .5s var(--ease-out);
+}
+/* 抠完图：清晰区上移，给下面的讲解卡腾位置 */
+.shibao.is-lifted .sb__view { top: 26%; box-shadow: 0 14px 34px rgba(0, 0, 0, .42); }
+.sb__scene { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+.sb__cutwrap {
   position: absolute;
   left: 29.333%; top: 14.667%; width: 46.667%; height: 77.778%;
   transform-origin: 88% 4%;
-  transition: transform .6s var(--ease-spring), opacity .45s var(--ease-out), filter .45s var(--ease-out);
+  transition: transform .62s var(--ease-spring), opacity .45s var(--ease-out), filter .45s var(--ease-out);
 }
-.shibao__cut {
-  width: 100%; height: 100%; display: block;
-  opacity: 0; transition: opacity .55s var(--ease-out);
-}
-.shibao.is-cutting .shibao__cut { opacity: 1; }
-.shibao.is-lifted .shibao__cutwrap { transform: scale(1.03); filter: drop-shadow(5px 6px 0 var(--ink)); }
+.sb__cut { width: 100%; height: 100%; display: block; opacity: 0; transition: opacity .55s var(--ease-out); }
+.shibao.is-cutting .sb__cut { opacity: 1; }
+.shibao.is-lifted .sb__cutwrap { transform: scale(1.04); filter: drop-shadow(4px 5px 0 var(--ink)); }
 
-/* 存进藏宝阁：主体留在原处，飞一个副本过去 */
-.shibao__fly {
-  position: absolute;
-  left: 29.333%; top: 14.667%; width: 46.667%; height: 77.778%;
-  object-fit: contain;
-  opacity: 0; pointer-events: none;
-  transform-origin: 88% 4%;
-}
-.shibao.is-vaulting .shibao__fly { animation: shibao-fly .72s var(--ease-out) forwards; }
-@keyframes shibao-fly {
-  0%   { opacity: 1; transform: none; }
-  70%  { opacity: 1; transform: scale(.18) translate(8%, -18%); }
-  100% { opacity: 0; transform: scale(.07) translate(10%, -22%); }
-}
-
-.shibao__svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.shibao__glow, .shibao__ray, .shibao__ink, .shibao__white {
+.sb__svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.sb__glow, .sb__ray, .sb__ink, .sb__white {
   fill: none;
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
   transition: stroke-dashoffset 1.05s var(--ease-out), opacity .4s var(--ease-out);
 }
-.shibao__glow { stroke: var(--lime); stroke-width: 30; opacity: 0; }
-.shibao__ray { stroke: var(--lime); stroke-width: 9; opacity: 0; }
-.shibao__ink { stroke: var(--ink); stroke-width: 13; }
-.shibao__white { stroke: #fff; stroke-width: 4.5; }
-.shibao.is-tracing .shibao__ray { stroke-dashoffset: 0; opacity: 1; }
-.shibao.is-tracing .shibao__glow { stroke-dashoffset: 0; opacity: .2; transition-delay: .12s; }
-.shibao.is-inking .shibao__ink { stroke-dashoffset: 0; transition-delay: .12s; }
-.shibao.is-inking .shibao__white { stroke-dashoffset: 0; transition-delay: .3s; }
-.shibao.is-cutting .shibao__ray,
-.shibao.is-cutting .shibao__glow { opacity: 0; }
+.sb__glow { stroke: var(--lime); stroke-width: 30; opacity: 0; }
+.sb__ray { stroke: var(--lime); stroke-width: 9; opacity: 0; }
+.sb__ink { stroke: var(--ink); stroke-width: 13; }
+.sb__white { stroke: #fff; stroke-width: 4.5; }
+.shibao.is-tracing .sb__ray { stroke-dashoffset: 0; opacity: 1; }
+.shibao.is-tracing .sb__glow { stroke-dashoffset: 0; opacity: .2; transition-delay: .12s; }
+.shibao.is-inking .sb__ink { stroke-dashoffset: 0; transition-delay: .12s; }
+.shibao.is-inking .sb__white { stroke-dashoffset: 0; transition-delay: .3s; }
+.shibao.is-cutting .sb__ray,
+.shibao.is-cutting .sb__glow { opacity: 0; }
 
 /* 取景框 */
-.shibao__finder { position: absolute; inset: 0; opacity: 0; transition: opacity .45s var(--ease-out); }
-.shibao.is-viewfinder .shibao__finder { opacity: 1; }
-.shibao__corner { position: absolute; width: 26px; height: 26px; border: 3px solid var(--paper); }
-.shibao__corner--tl { top: 14px; left: 14px; border-right: 0; border-bottom: 0; border-radius: 8px 0 0 0; }
-.shibao__corner--tr { top: 14px; right: 14px; border-left: 0; border-bottom: 0; border-radius: 0 8px 0 0; }
-.shibao__corner--bl { bottom: 14px; left: 14px; border-right: 0; border-top: 0; border-radius: 0 0 0 8px; }
-.shibao__corner--br { bottom: 14px; right: 14px; border-left: 0; border-top: 0; border-radius: 0 0 8px 0; }
-.shibao__scanline {
-  position: absolute; left: 6%; right: 6%; height: 3px;
+.sb__finder { position: absolute; inset: 0; opacity: 0; transition: opacity .45s var(--ease-out); }
+.shibao.is-viewfinder .sb__finder { opacity: 1; }
+.sb__corner { position: absolute; width: 16px; height: 16px; border: 2px solid var(--paper); }
+.sb__corner--tl { top: 8px; left: 8px; border-right: 0; border-bottom: 0; border-radius: 5px 0 0 0; }
+.sb__corner--tr { top: 8px; right: 8px; border-left: 0; border-bottom: 0; border-radius: 0 5px 0 0; }
+.sb__corner--bl { bottom: 8px; left: 8px; border-right: 0; border-top: 0; border-radius: 0 0 0 5px; }
+.sb__corner--br { bottom: 8px; right: 8px; border-left: 0; border-top: 0; border-radius: 0 0 5px 0; }
+.sb__scanline {
+  position: absolute; left: 6%; right: 6%; height: 2px;
   background: var(--lime); border-radius: 2px;
-  box-shadow: 0 0 18px 4px rgba(203, 239, 114, .55);
+  box-shadow: 0 0 12px 3px rgba(203, 239, 114, .55);
   opacity: 0; top: 8%;
 }
-.shibao.is-scanning .shibao__scanline { opacity: 1; animation: shibao-scan 1.1s var(--ease-out) forwards; }
+.shibao.is-scanning .sb__scanline { opacity: 1; animation: shibao-scan 1.1s var(--ease-out) forwards; }
 @keyframes shibao-scan {
   from { top: 8%; opacity: 0; }
   20%  { opacity: 1; }
   to   { top: 88%; opacity: 0; }
 }
-.shibao__badge {
-  position: absolute; top: 14px; left: 50%; transform: translateX(-50%) scale(.8);
-  padding: 5px 14px;
+.sb__badge {
+  position: absolute; top: 8px; left: 50%;
+  transform: translateX(-50%) scale(.8);
+  padding: 3px 10px;
   background: var(--lime);
   border: 2px solid var(--ink); border-radius: var(--radius-pill);
-  font-size: 13px; font-weight: 700;
+  font-size: 10px; font-weight: 700;
   opacity: 0; transition: opacity .3s var(--ease-out), transform .45s var(--ease-spring);
 }
-.shibao.is-viewfinder .shibao__badge { opacity: 1; transform: translateX(-50%) scale(1); }
+.shibao.is-viewfinder .sb__badge { opacity: 1; transform: translateX(-50%) scale(1); }
 
-/* 藏宝阁 */
-.shibao__vault {
-  position: absolute; top: 12px; right: 12px;
-  display: flex; align-items: center; gap: 8px;
-  padding: 6px 12px 6px 14px;
+/* 藏宝阁 chip */
+.sb__vault {
+  position: absolute; top: 10px; right: 10px;
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 9px;
   background: var(--paper);
   border: 2px solid var(--ink); border-radius: var(--radius-pill);
-  box-shadow: var(--shadow-xs);
-  opacity: 0; transform: translateY(-8px);
+  font-size: 10px; font-weight: 700;
+  opacity: 0; transform: translateY(-6px);
   transition: opacity .4s var(--ease-out), transform .5s var(--ease-spring);
 }
-.shibao.is-viewfinder .shibao__vault { opacity: 1; transform: none; }
-.shibao__vault-name { font-size: 12px; font-weight: 700; letter-spacing: .06em; }
-.shibao__vault-count {
-  font-family: var(--font-num); font-weight: 900; font-size: 15px;
-  min-width: 1.1em; text-align: center;
-}
-.shibao.is-vaulting .shibao__vault { transform: scale(1.12); }
-.shibao.is-vaulting .shibao__vault-count { color: var(--purple); }
+.shibao.is-viewfinder .sb__vault { opacity: 1; transform: none; }
+.sb__vault-count { font-family: var(--font-num); font-weight: 900; font-size: 12px; }
+.shibao.is-vaulting .sb__vault { transform: scale(1.12); }
 
-/* 下半：讲解卡视口。卡片在这里从下方滑入，被裁在本区内，绝不会盖住上面的识别画面 */
-.shibao__tray {
-  position: relative;
-  height: 566px;
-  overflow: hidden;
+/* 讲解卡：抠完图后从下滑入，占下半屏，内部可滚 */
+.sb__sheet {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  height: 60%;
+  padding: 14px 14px 16px;
   background: var(--paper);
-}
-.shibao__sheet {
-  position: absolute; inset: 0;
-  padding: 16px 18px 20px;
-  background: var(--paper);
+  border-top: 2px solid var(--ink);
+  border-radius: 14px 14px 0 0;
   overflow-y: auto;
   overscroll-behavior: contain;
   transform: translateY(101%);
-  transition: transform .52s var(--ease-spring);
+  transition: transform .55s var(--ease-spring);
 }
-.shibao.is-lifted .shibao__sheet { transform: none; }
-.shibao__sheet-head { padding-bottom: 10px; border-bottom: 2px solid var(--paper-2); }
-.shibao__sheet-name { font-size: 20px; font-weight: 800; }
-.shibao__sheet-meta { margin-top: 3px; font-size: 12px; color: var(--muted); }
-.shibao__sec { margin-top: 11px; opacity: 0; transform: translateY(10px); transition: opacity .4s var(--ease-out), transform .5s var(--ease-spring); transition-delay: var(--d, 0ms); }
-.shibao.is-lifted .shibao__sec { opacity: 1; transform: none; }
-.shibao__sec-t { font-size: 11.5px; font-weight: 800; letter-spacing: .06em; color: var(--purple); }
-.shibao__sec-b { margin-top: 3px; font-size: 12.5px; line-height: 1.62; color: var(--ink-2); }
-.shibao__tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 6px; }
-.shibao__tags span {
-  padding: 3px 9px;
+.shibao.is-lifted .sb__sheet { transform: none; }
+.sb__sheet-head { padding-bottom: 8px; border-bottom: 2px solid var(--paper-2); }
+.sb__sheet-name { font-size: 16px; font-weight: 800; }
+.sb__sheet-meta { margin-top: 2px; font-size: 10.5px; color: var(--muted); }
+.sb__sec {
+  margin-top: 9px;
+  opacity: 0; transform: translateY(8px);
+  transition: opacity .4s var(--ease-out), transform .5s var(--ease-spring);
+  transition-delay: var(--d, 0ms);
+}
+.shibao.is-lifted .sb__sec { opacity: 1; transform: none; }
+.sb__sec-t { font-size: 10px; font-weight: 800; letter-spacing: .06em; color: var(--purple); }
+.sb__sec-b { margin-top: 2px; font-size: 11px; line-height: 1.6; color: var(--ink-2); }
+.sb__tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px; }
+.sb__tags span {
+  padding: 2px 7px;
   background: var(--paper-2);
   border: 2px solid var(--ink); border-radius: var(--radius-tag);
-  font-size: 11.5px; font-weight: 700;
+  font-size: 10px; font-weight: 700;
 }
-
-.shibao__replay { margin-top: 16px; }
+.shibao__replay { margin-top: 14px; }
 
 @media (prefers-reduced-motion: reduce) {
-  .shibao__scanline { animation: none; }
+  .sb__scanline { animation: none; }
+}
+
+/* ---- 藏宝阁：手机比例的木质书柜（透视，远看一行放三幅） ---- */
+.vault { background: var(--paper); padding: clamp(64px,9vw,120px) 0; }
+.case { position: relative; }
+.case__room {
+  position: relative;
+  aspect-ratio: 1080 / 2400;
+  display: flex; flex-direction: column;
+  background: linear-gradient(180deg, var(--paper) 0%, var(--paper-2) 100%);
+  overflow: hidden;
+}
+.case__bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: 2px solid var(--ink);
+  font-size: 12px; font-weight: 700;
+}
+.case__count { color: var(--ink-2); }
+.case__count b { font-family: var(--font-num); font-weight: 900; font-size: 14px; color: var(--ink); }
+
+/* 透视：像站在书柜前两米远 */
+.case__stage { flex: 1; display: grid; place-items: center; perspective: 900px; padding: 4% 5%; }
+.case__cab {
+  width: 100%;
+  align-self: center;
+  padding: 10px 10px 0;
+  background: url("assets/wood.webp") center / cover;
+  border: 3px solid #452b14;
+  border-radius: 4px;
+  box-shadow: inset 0 0 46px rgba(0, 0, 0, .5), 0 12px 26px rgba(0, 0, 0, .32);
+  transform: rotateX(11deg);
+  transform-style: preserve-3d;
+}
+.case__row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; align-items: end; }
+.case__row--empty { align-items: stretch; }
+
+.piece { margin: 0; opacity: 0; transform: translateY(-14px) scale(.96); }
+.piece img {
+  display: block; width: 100%; height: auto;
+  background: var(--paper);
+  border: 2px solid #2a1a0c;
+  border-radius: 3px;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, .38);
+  transition: transform .42s var(--ease-spring);
+}
+.piece:hover img { transform: translateY(-4px) rotate(-.8deg); }
+.piece figcaption {
+  margin-top: 3px; text-align: center;
+  font-size: 8px; letter-spacing: .02em;
+  color: rgba(255, 255, 255, .82);
+}
+
+.case__board {
+  height: 11px;
+  margin: 6px -10px 11px;
+  background: url("assets/wood.webp") center / cover;
+  border-top: 2px solid rgba(255, 255, 255, .28);
+  border-bottom: 3px solid #33200f;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, .45);
+}
+.slot {
+  display: block;
+  aspect-ratio: 4 / 5;
+  border: 1px dashed rgba(255, 255, 255, .32);
+  border-radius: 3px;
+}
+
+/* 落架：从上方落下，弹性收住 */
+.case.is-in .piece {
+  opacity: 1; transform: none;
+  transition: opacity .4s var(--ease-out) calc(var(--i, 0) * 160ms),
+              transform .68s var(--ease-spring) calc(var(--i, 0) * 160ms);
+}
+.case__hint {
+  padding: 0 16px 16px;
+  text-align: center;
+  font-size: 10.5px; line-height: 1.5;
+  color: var(--muted);
 }
 
 /* ---- 关键词跑马灯 ---- */

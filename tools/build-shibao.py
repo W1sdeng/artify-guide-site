@@ -196,6 +196,38 @@ def build() -> None:
     print("shibao-outline.txt:", len(d), "字符 ->", txt)
 
 
+# 藏宝阁书架上另外两幅（同一套抠图规格，风格统一）
+VAULT_ITEMS = [
+    ("1915", "vault-2.webp"),
+    ("Vetheuil", "vault-3.webp"),
+]
+
+
+def build_vault() -> None:
+    import glob
+
+    for keyword, out_name in VAULT_ITEMS:
+        hits = [p for p in glob.glob(os.path.join(BACKDROP_DIR, "*")) if keyword in os.path.basename(p)]
+        if not hits:
+            print("跳过（找不到）:", keyword)
+            continue
+        src = Image.open(hits[0]).convert("RGB")
+        im = fit(src, CUT_W, CUT_H)
+        im = ImageEnhance.Contrast(im).enhance(1.04)
+        im = ImageEnhance.Brightness(im).enhance(1.02)
+        cut = im.convert("RGBA")
+        alpha = Image.new("L", cut.size, 255)
+        ImageDraw.Draw(alpha).rounded_rectangle(
+            (0, 0, cut.width - 1, cut.height - 1), radius=3, fill=255
+        )
+        alpha = alpha.filter(ImageFilter.GaussianBlur(1.2))
+        cut.putalpha(alpha)
+        out = os.path.join(ASSETS, out_name)
+        cut.save(out, "WEBP", quality=80, method=6)
+        print(f"{out_name}: {cut.size} {os.path.getsize(out) // 1024}KB  <- {os.path.basename(hits[0])}")
+
+
 if __name__ == "__main__":
     build()
+    build_vault()
 

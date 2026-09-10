@@ -280,6 +280,48 @@
   })();
 
   /* ============================================================
+     藏宝阁：滚进视口，作品依次落架 + 收藏数滚动
+     ============================================================ */
+  (function () {
+    const shelf = $("#shelf");
+    if (!shelf) return;
+    const countEl = $("#vaultCount");
+    let tick = null;
+    function play() {
+      shelf.classList.remove("is-in");
+      void shelf.offsetWidth;
+      shelf.classList.add("is-in");
+      if (!countEl) return;
+      if (tick) { clearInterval(tick); tick = null; }
+      if (reduce.matches) { countEl.textContent = "3"; return; }
+      let n = 0;
+      countEl.textContent = "0";
+      window.setTimeout(() => {
+        tick = window.setInterval(() => {
+          n += 1;
+          countEl.textContent = String(n);
+          if (n >= 3) { clearInterval(tick); tick = null; }
+        }, 150);
+      }, 320);
+    }
+    if ("IntersectionObserver" in window) {
+      let seen = false;
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((en) => {
+            if (en.isIntersecting) { if (!seen) { seen = true; play(); } }
+            else { seen = false; }
+          });
+        },
+        { threshold: 0.28 }
+      );
+      io.observe(shelf);
+    } else {
+      play();
+    }
+  })();
+
+  /* ============================================================
      概念卡剧场
      ============================================================ */
   const deck = $("#deck");
