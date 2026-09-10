@@ -535,6 +535,34 @@ html:not(.js) .step { opacity: 1; }
 }
 
 /* ============================================================
+   法律页（隐私政策 / 用户协议）
+   ============================================================ */
+.legal { background: var(--canvas); padding: clamp(32px,5vw,64px) 0 clamp(64px,8vw,96px); }
+.legal__card {
+  max-width: 860px;
+  margin-inline: auto;
+  padding: clamp(26px,4vw,58px);
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-lg);
+}
+.legal__card h1 { font-size: clamp(30px,4vw,44px); font-weight: 800; line-height: 1.15; }
+.legal__meta { margin-top: 10px; font-family: var(--font-num); font-size: 14px; letter-spacing: .04em; color: var(--muted); }
+.legal__card h2 { margin-top: 42px; font-size: clamp(19px,2.2vw,24px); font-weight: 800; }
+.legal__card h2:first-of-type { margin-top: 32px; }
+.legal__card p { margin-top: 12px; line-height: 1.85; color: var(--ink-2); }
+.legal__card ul { margin: 4px 0 0; }
+.legal__card li { position: relative; margin-top: 10px; padding-left: 20px; line-height: 1.85; color: var(--ink-2); }
+.legal__card li::before {
+  content: ""; position: absolute; left: 4px; top: .82em;
+  width: 6px; height: 6px; margin-top: -3px;
+  background: var(--ink); border-radius: 50%;
+}
+.legal__card strong { color: var(--ink); font-weight: 700; }
+.legal__actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 44px; }
+
+/* ============================================================
    降低动效偏好：飞行、旋转、视差、跑马灯全部退化
    ============================================================ */
 @media (prefers-reduced-motion: reduce) {
