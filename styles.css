@@ -277,6 +277,8 @@ html.js .hero__title.is-in .hero__line-in {
   border-radius: 40px;
   box-shadow: var(--shadow-lg);
   will-change: transform;
+  /* 基础倾斜常驻（桌面视差在其上叠加） */
+  transform: rotate(-3deg);
 }
 .phone__screen { border: 2px solid var(--ink); border-radius: 30px; overflow: hidden; background: var(--paper-2); }
 .phone__screen img { width: 100%; height: auto; }
