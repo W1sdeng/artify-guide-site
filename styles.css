@@ -25,11 +25,14 @@
   --fs-caption: 13px;
   --fs-overline: 11px;
 
-  --ease-spring: cubic-bezier(0.34,1.56,0.64,1);
-  --ease-out: cubic-bezier(0.22,1,0.36,1);
+  /* 动效三档（对齐 App geometry.motion）：instant / grade / celebrate */
+  --ease-spring: cubic-bezier(0.34,1.56,0.64,1);   /* enter：进场/俏皮 */
+  --ease-out: cubic-bezier(0.22,1,0.36,1);          /* 揭示/退场 */
+  --ease-pop: cubic-bezier(0.22,1.2,0.36,1);
   --dur-press: 200ms;
   --dur-enter: 450ms;
   --dur-celebrate: 800ms;
+  --stagger: 70ms;                                  /* 统一交错步长 */
 
   --radius-card:16px; --radius-sm:12px; --radius-tag:8px; --radius-pill:999px;
   /* 2.5D 底部 ink 底座（对齐 App shadow25D）：0 横向偏移、同圆角，不是斜投影 */
@@ -295,6 +298,9 @@ html.js .hero__title.is-in .hero__line-in {
 .theater { background: var(--paper); padding: clamp(22px,2.4vw,34px) 0; }
 .theater .section-head { margin-bottom: clamp(18px,2.6vw,34px); }
 .section-head { margin-bottom: clamp(40px,6vw,64px); }
+/* 统一的章节标题模板：标签 → 标题 → 副文，间距固定 */
+.section-head .overline,
+.download__copy > .overline { margin-bottom: 14px; }
 
 /* isolation: isolate 把卡片的 z-index 关在这一层里，
    否则卡片会盖住吸顶导航和微课浮层（曾经的两个线上 bug） */
@@ -909,8 +915,8 @@ html.js .nav.is-ready .nav__links a:nth-child(7) { transition-delay: .42s; }
 .install__step p { font-weight: 700; }
 
 /* ---- 常见问题 ---- */
-.faq { background: var(--paper); padding: clamp(64px,9vw,120px) 0; }
-.faq h2 { margin-bottom: 32px; }
+.faq { background: var(--paper); padding: clamp(40px,5vw,68px) 0; }
+.faq h2 { margin-bottom: 0; }
 .faq__list { display: grid; gap: 14px; max-width: 840px; }
 .faq__item {
   background: var(--paper); border: 2px solid var(--ink);
