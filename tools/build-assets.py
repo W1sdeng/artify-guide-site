@@ -29,6 +29,8 @@ SCREENSHOTS = {
     "screenshot-scene.webp": "scene.png",
     "screenshot-handbook.webp": "handbook.png",
     "screenshot-route.webp": "route.png",
+    # 文艺助手真实界面（气泡由网页 DOM 重新演，背景同色盖住原气泡）
+    "screenshot-ai.webp": "ai.png",
 }
 
 

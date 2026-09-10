@@ -21,8 +21,9 @@
     [1180, "is-tracing"],
     [1760, "is-inking"],
     [2360, "is-cutting"],
-    [2940, "is-lifted"],
-    [3540, "is-vaulting"],
+    [2940, "is-lifted"],   // 讲解卡从下往上滑出
+    [3420, "is-reading"],  // 卡内分段逐段浮现
+    [3900, "is-vaulting"], // 飞一份进藏宝阁
   ];
   const CLASSES = STEPS.map((s) => s[1]);
 
@@ -59,7 +60,7 @@
     STEPS.forEach(([t, cls]) => {
       timers.push(window.setTimeout(() => root.classList.add(cls), t));
     });
-    vaultTimer = window.setTimeout(() => setCount(1), 3620);
+    vaultTimer = window.setTimeout(() => setCount(1), 3980);
   }
 
   let played = false;

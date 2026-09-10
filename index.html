@@ -220,9 +220,38 @@
               </div>
 
               <div class="shibao__sheet" aria-hidden="true">
-                <p class="shibao__sheet-name">睡莲</p>
-                <p class="shibao__sheet-meta">克劳德·莫奈 · 1897–1899 · 布面油画</p>
-                <p class="shibao__sheet-say">他画的不是花，是光落在水面上的那一秒。</p>
+                <div class="shibao__sheet-head">
+                  <p class="shibao__sheet-name">睡莲</p>
+                  <p class="shibao__sheet-meta">克劳德·莫奈 · 1897–1899 · 布面油画</p>
+                </div>
+                <div class="shibao__sec" style="--d:0ms">
+                  <p class="shibao__sec-t">这是什么</p>
+                  <p class="shibao__sec-b">莫奈晚年在吉维尼花园画的池塘。这一幅里没有岸、没有天空，整张画就是水面。</p>
+                </div>
+                <div class="shibao__sec" style="--d:60ms">
+                  <p class="shibao__sec-t">怎么看 · 好在哪</p>
+                  <p class="shibao__sec-b">别盯着花看，看水。近看是一小笔一小笔散开的颜色，退开两步才合成光和影。</p>
+                </div>
+                <div class="shibao__sec" style="--d:120ms">
+                  <p class="shibao__sec-t">怎么聊不露馅</p>
+                  <p class="shibao__sec-b">「它画的不是花，是光停在水面上的那一秒。」</p>
+                </div>
+                <div class="shibao__sec" style="--d:180ms">
+                  <p class="shibao__sec-t">技法 · 工艺</p>
+                  <p class="shibao__sec-b">短促笔触并置，几乎不用黑色，靠邻近色和补色让眼睛自己去调。</p>
+                </div>
+                <div class="shibao__sec" style="--d:240ms">
+                  <p class="shibao__sec-t">作者生平</p>
+                  <p class="shibao__sec-b">莫奈（1840–1926），印象派奠基者之一。晚年白内障影响辨色，睡莲系列的色调反而更偏红黄。</p>
+                </div>
+                <div class="shibao__sec" style="--d:300ms">
+                  <p class="shibao__sec-t">历史 · 文化意义</p>
+                  <p class="shibao__sec-b">睡莲组画把「看」本身当成主题，直接影响后来的抽象绘画。</p>
+                </div>
+                <div class="shibao__sec" style="--d:360ms">
+                  <p class="shibao__sec-t">关联概念</p>
+                  <p class="shibao__tags"><span>印象派</span><span>笔触</span><span>光色关系</span><span>观看距离</span></p>
+                </div>
               </div>
             </div>
             <button class="btn btn--ghost shibao__replay" id="shibaoReplay" type="button">重放</button>
@@ -256,11 +285,26 @@
           </ul>
         </div>
         <div class="feature__media">
-          <div class="chat" role="img" aria-label="文艺助手对话示例">
-            <div class="chat__row chat__row--user"><p class="bubble bubble--user">本真性和「做自己」有什么区别？</p></div>
-            <div class="chat__row chat__row--bot"><p class="bubble bubble--bot">不是任性做自己，是承担起自身的有限处境和选择。</p></div>
-            <div class="chat__row chat__row--user"><p class="bubble bubble--user">那惯习呢？</p></div>
-            <div class="chat__row chat__row--bot"><p class="bubble bubble--bot">那些你以为天生就有的品味和反应，其实是长期处境养成的。</p></div>
+          <!-- 文艺助手：真实界面截图 + 我提问 -> 思考 -> 回答的气泡动画 -->
+          <div class="shot ai" id="ai" role="img" aria-label="文艺助手：我提问，它先思考再回答">
+            <img class="ai__shot" src="assets/screenshot-ai.webp" width="1080" height="2400"
+                 loading="lazy" decoding="async" alt="文艺助手的真实界面">
+            <div class="ai__chat" aria-hidden="true">
+              <div class="ai__row ai__row--user" data-ai="1">
+                <p class="ai__bubble ai__bubble--user">莫奈的《睡莲》到底好在哪？我一直没看出来。</p>
+              </div>
+              <div class="ai__row ai__row--bot" data-ai="2">
+                <span class="ai__who">文艺助手</span>
+                <p class="ai__bubble ai__bubble--bot ai__typing"><span></span><span></span><span></span></p>
+              </div>
+              <div class="ai__row ai__row--bot" data-ai="3">
+                <span class="ai__who">文艺助手</span>
+                <p class="ai__bubble ai__bubble--bot">别盯着花看，看水面。他几乎不用黑色，靠一小笔一小笔的颜色并置，让眼睛自己去调。</p>
+              </div>
+              <div class="ai__row ai__row--bot" data-ai="4">
+                <p class="ai__bubble ai__bubble--bot">凑近看笔触是散的，退开两步才成立——这是印象派最典型的一手。</p>
+              </div>
+            </div>
           </div>
         </div>
       </article>

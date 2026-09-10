@@ -166,6 +166,62 @@
   }
 
   /* ============================================================
+     概念卡：滚进视口时五张卡依次发牌入场
+     ============================================================ */
+  (function () {
+    const stage = $(".deck-stage");
+    if (!stage || !("IntersectionObserver" in window)) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((en) => {
+          if (!en.isIntersecting || reduce.matches) return;
+          stage.classList.remove("is-dealing");
+          void stage.offsetWidth; // 强制回流，让动画可以重复触发
+          stage.classList.add("is-dealing");
+        });
+      },
+      { threshold: 0.5 }
+    );
+    io.observe(stage);
+  })();
+
+  /* ============================================================
+     文艺助手：我提问 -> 思考 -> 回答，气泡依次弹入（每次进视口重放）
+     ============================================================ */
+  (function () {
+    const ai = $("#ai");
+    if (!ai) return;
+    const STEPS = [[0, "is-step1"], [560, "is-step2"], [2200, "is-step3"], [2820, "is-step4"]];
+    let timers = [];
+    function play() {
+      timers.forEach(clearTimeout);
+      timers = [];
+      ai.classList.remove("is-step1", "is-step2", "is-step3", "is-step4");
+      if (reduce.matches) {
+        ai.classList.add("is-step1", "is-step2", "is-step3", "is-step4");
+        return;
+      }
+      void ai.offsetWidth;
+      STEPS.forEach(([t, c]) => timers.push(window.setTimeout(() => ai.classList.add(c), t)));
+    }
+    if ("IntersectionObserver" in window) {
+      let visible = false;
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((en) => {
+            if (en.isIntersecting) { if (!visible) { visible = true; play(); } }
+            else { visible = false; }
+          });
+        },
+        { threshold: 0.4 }
+      );
+      io.observe(ai);
+    } else {
+      play();
+    }
+  })();
+
+  /* ============================================================
      数字计数器
      ============================================================ */
   function countUp(el) {
@@ -204,6 +260,25 @@
     $$("[data-step]").forEach((el) => el.classList.add("is-lit"));
   }
 
+  /* 现场题五步：滚进视口时依次往上滑入（墨水加强仍由上面的 is-lit 驱动） */
+  (function () {
+    const ol = $(".steps");
+    if (!ol || !("IntersectionObserver" in window)) return;
+    $$(".step", ol).forEach((li, i) => li.style.setProperty("--i", i));
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((en) => {
+          if (!en.isIntersecting || reduce.matches) return;
+          ol.classList.remove("is-dealt");
+          void ol.offsetWidth;
+          ol.classList.add("is-dealt");
+        });
+      },
+      { threshold: 0.35 }
+    );
+    io.observe(ol);
+  })();
+
   /* ============================================================
      概念卡剧场
      ============================================================ */
@@ -218,8 +293,10 @@
   let firstRender = true;
 
   let frontX = 0, frontY = 0, frontR = 0, frontS = 1;
-  let mode = "idle"; // idle | drag | fly | spring
-  let rafId = null;
+  let mode = "idle"; // idle | drag | spring
+  let rafId = null;        // 当前牌面的动画（回弹）
+  let flyRaf = null;       // 退场卡的动画，独立于牌面，抓下一张不会打断它
+  let flyingEl = null;     // 正在退场的那张，render() 不碰它
   let pointer = null;
   let suppressClick = false;
 
@@ -230,6 +307,7 @@
       el.className = "card";
       el.dataset.index = i;
       el.style.transition = "none";
+      el.style.setProperty("--i", i); // 发牌入场的错峰序号
       el.innerHTML =
         '<div class="card__top">' +
           '<span class="card__idx">' + c.idx + "</span>" +
@@ -262,18 +340,26 @@
     }
   }
 
+  // 任何 NaN 都会让整条 transform 声明失效、卡片瞬间丢失居中，这里统一兜底
+  function num(v) { return Number.isFinite(v) ? v : 0; }
+
+  function setCardVars(el, x, y, r, s) {
+    el.style.setProperty("--x", num(x) + "px");
+    el.style.setProperty("--y", num(y) + "px");
+    el.style.setProperty("--r", num(r) + "deg");
+    el.style.setProperty("--s", num(s) || 1);
+  }
+
   function render() {
     cardsEl.forEach((el, i) => {
+      if (el === flyingEl) return; // 退场中的那张自己管自己
       const off = i - current;
       let x = 0, y = 0, r = 0, s = 0.85, o = 0, z = 100 - off;
       if (off === 0) { x = frontX; y = frontY; r = frontR; s = frontS; o = 1; }
       // 位移收敛：卡片缩小后右边缘不得越过卡组，否则在窄屏上会溢出到版心外
       else if (off === 1) { x = 8; y = 16; r = 2; s = 0.95; o = 1; }
       else if (off === 2) { x = 16; y = 32; r = 4; s = 0.9; o = 1; }
-      el.style.setProperty("--x", num(x) + "px");
-      el.style.setProperty("--y", num(y) + "px");
-      el.style.setProperty("--r", num(r) + "deg");
-      el.style.setProperty("--s", num(s) || 1);
+      setCardVars(el, x, y, r, s);
       el.style.opacity = o;
       el.style.zIndex = z;
       el.style.transition = (firstRender || off < 0 || off > 2) ? "none" : "";
@@ -284,16 +370,10 @@
     firstRender = false;
   }
 
-  // 任何 NaN 都会让整条 transform 声明失效、卡片瞬间丢失居中，这里统一兜底
-  function num(v) { return Number.isFinite(v) ? v : 0; }
-
   function applyFront() {
     const el = cardsEl[current];
     if (!el) return;
-    el.style.setProperty("--x", num(frontX) + "px");
-    el.style.setProperty("--y", num(frontY) + "px");
-    el.style.setProperty("--r", num(frontR) + "deg");
-    el.style.setProperty("--s", num(frontS) || 1);
+    setCardVars(el, frontX, frontY, frontR, frontS);
   }
 
   function updateProgress() {
@@ -354,6 +434,9 @@
 
     cancelAnimation();
     mode = "idle";
+    // 用户上手就停掉发牌入场，避免动画和拖拽抢同一个 transform
+    const stage = el.parentElement;
+    if (stage) stage.classList.remove("is-dealing");
     const v = readVisual(el);
     frontX = v.x; frontY = v.y; frontR = v.rot; frontS = v.scale;
 
@@ -456,48 +539,59 @@
   }
 
   // 飞出：以松手速度为初速度的指数逼近，保证速度交接、无顿挫
+  /**
+   * 飞出。关键在「松手即交接」：
+   * 判定甩出的这一刻就把下一张提升为可拖的牌面，退场动画另起一条 rAF 独立跑，
+   * 所以松手后可以立刻抓下一张，不会再卡 0.5 秒。
+   */
   function flyOut(dir, v0) {
     const el = cardsEl[current];
     if (!el) return;
-    mode = "fly";
-    el.style.transition = "none";
+    const leaving = CARDS[current];
+    const entered = dir > 0;
     const cardHalf = el.getBoundingClientRect().width / 2 || 170;
     const startX = frontX;
     const targetX = dir * (window.innerWidth * 1.15 + cardHalf);
     const dist = targetX - startX;
-    let k = Math.abs(v0) / Math.abs(dist || 1);
-    k = clamp(k, 3.2, 16);
-    let prev = performance.now();
+    const k = clamp(Math.abs(v0) / Math.abs(dist || 1), 3.2, 16);
 
-    function frame(now) {
-      const dt = Math.min((now - prev) / 1000, 0.05);
-      prev = now;
-      const p = 1 - Math.exp(-k * dt);
-      frontX += (targetX - frontX) * p;
-      frontR = dir * 16;
-      frontS = 1;
-      applyFront();
-      updateHints(frontX);
-      updateDecor(frontX);
-      if (Math.abs(targetX - frontX) < 4) { finish(dir, el); return; }
-      rafId = requestAnimationFrame(frame);
-    }
-    rafId = requestAnimationFrame(frame);
-  }
-
-  function finish(dir, el) {
-    rafId = null;
-    mode = "idle";
-    const entered = dir > 0;
-    const leaving = CARDS[current];
+    // 1) 交接：退场的卡摘出交互，牌面立刻前进
+    flyingEl = el;
+    el.style.pointerEvents = "none";
+    el.setAttribute("aria-hidden", "true");
+    el.tabIndex = -1;
+    el.classList.remove("is-dragging");
     if (current < CARDS.length - 1) current++;
     frontX = 0; frontY = 0; frontR = 0; frontS = 1;
-    el.style.opacity = 0;
+    mode = "idle";
     render();
     updateProgress();
     updateHints(0);
     updateDecor(0);
-    if (entered) openCourse(leaving);
+
+    // 2) 退场：独立动画，不碰牌面状态，也不会被下一次拖拽打断
+    el.style.transition = "none";
+    let fx = startX;
+    let prev = performance.now();
+    function frame(now) {
+      const dt = Math.min((now - prev) / 1000, 0.05);
+      prev = now;
+      const p = 1 - Math.exp(-k * dt);
+      fx += (targetX - fx) * p;
+      setCardVars(el, fx, 0, dir * 16, 1);
+      if (Math.abs(targetX - fx) < 4) {
+        el.style.opacity = 0;
+        setCardVars(el, 0, 0, 0, 0.85);
+        flyingEl = null;
+        flyRaf = null;
+        return;
+      }
+      flyRaf = requestAnimationFrame(frame);
+    }
+    flyRaf = requestAnimationFrame(frame);
+
+    // 右滑 = 进这一课（浮层延后一点，让飞出的动画被看见）
+    if (entered && leaving) window.setTimeout(() => openCourse(leaving), 300);
   }
 
   function skip() {
