@@ -678,10 +678,12 @@
       startY: e.clientY,
       startFrontX: frontX,
       startFrontY: frontY,
+      baseScale: v.scale,
       lastX: e.clientX,
       lastT: performance.now(),
       vx: 0,
-      moved: false
+      moved: false,
+      scaled: false
     };
     suppressClick = false;
     el.setPointerCapture(e.pointerId);
@@ -690,7 +692,7 @@
     deck.classList.add("is-dragging");
     mode = "drag";
 
-    frontS = v.scale * 1.02;
+    // 按下先不放大：等确认是横向拖动再放大，避免纵向滚动被误判
     applyFront();
   }
 
@@ -703,6 +705,12 @@
     if (current === CARDS.length - 1) frontX = rubber(frontX);
     frontY = pointer.startFrontY + dy * 0.25;
     frontR = frontX / window.innerWidth * 16;
+
+    // 只有横向意图明显（横移>8px 且大于纵向）才触发放大，纵向滑动交给页面
+    if (!pointer.scaled && Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) {
+      pointer.scaled = true;
+      frontS = pointer.baseScale * 1.02;
+    }
 
     applyFront();
     updateHints(frontX);
@@ -922,6 +930,7 @@
   (function () {
     const links = $$(".nav__links a[href^='#']");
     if (!links.length) return;
+    const navInk = $(".nav__ink");
     const pairs = [];
     links.forEach((a) => {
       const sec = document.getElementById(a.getAttribute("href").slice(1));
@@ -940,6 +949,14 @@
         hit = pairs[pairs.length - 1][1];
       }
       links.forEach((l) => l.classList.toggle("is-active", l === hit));
+      if (navInk) {
+        if (hit) {
+          navInk.style.width = hit.offsetWidth + "px";
+          navInk.style.transform = "translateX(" + hit.offsetLeft + "px)";
+        } else {
+          navInk.style.width = "0px";
+        }
+      }
     }
     window.addEventListener("scroll", () => {
       if (queued) return;
