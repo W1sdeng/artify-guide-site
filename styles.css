@@ -204,11 +204,13 @@ h3 { font-size: var(--fs-h3); line-height: 1.3; font-weight: 700; }
 .hero__title { font-size: var(--fs-display); line-height: 1.08; font-weight: 800; margin: 14px 0 0; letter-spacing: -.02em; }
 .hero__line { display: block; }
 /* 只有 JS 可用时才隐藏等待入场；无 JS 时标题必须直接可见 */
-html.js .hero__title .char { display: inline-block; opacity: 0; transform: translateY(.55em); }
-.hero__title.is-in .char {
-  opacity: 1; transform: none;
-  transition: opacity var(--dur-enter) var(--ease-out), transform var(--dur-enter) var(--ease-spring);
-  transition-delay: calc(var(--ci) * 45ms);
+html.js /* 遮罩逐行上浮：每行包一层 overflow:hidden，内容从下方升起 */
+.hero__line { display: block; overflow: hidden; padding-bottom: .06em; }
+html.js .hero__line-in { display: block; transform: translateY(112%); }
+html.js .hero__title.is-in .hero__line-in {
+  transform: none;
+  transition: transform .8s var(--ease-spring);
+  transition-delay: calc(var(--li, 0) * 110ms);
 }
 .hero__sub { margin-top: 24px; max-width: 40ch; font-size: 17px; color: var(--ink); }
 /* 首屏左侧的三条实测说明：把空白填实，也是这个 App 最简洁的解释 */
@@ -615,6 +617,60 @@ html.js .hero__title .char { display: inline-block; opacity: 0; transform: trans
 @media (prefers-reduced-motion: reduce) {
   .sb__scanline { animation: none; }
 }
+
+/* ---- clip-path 揭示（trevornoah）：按钮从右往左刷出，导航项逐个刷出 ---- */
+html.js .btn--reveal { clip-path: inset(0 100% 0 0 round 999px); transition: clip-path .72s var(--ease-out); }
+html.js .btn--reveal.is-in { clip-path: inset(0 0 0 0 round 999px); }
+html.js .nav__links a { clip-path: inset(0 100% 0 0); transition: clip-path .55s var(--ease-out); }
+html.js .nav.is-ready .nav__links a { clip-path: inset(0 0 0 0); }
+html.js .nav.is-ready .nav__links a:nth-child(2) { transition-delay: .07s; }
+html.js .nav.is-ready .nav__links a:nth-child(3) { transition-delay: .14s; }
+html.js .nav.is-ready .nav__links a:nth-child(4) { transition-delay: .21s; }
+html.js .nav.is-ready .nav__links a:nth-child(5) { transition-delay: .28s; }
+html.js .nav.is-ready .nav__links a:nth-child(6) { transition-delay: .35s; }
+
+/* ---- 编号索引（laxspace）：导航项前面带 01…06 ---- */
+.nav__links { counter-reset: navno; }
+.nav__links a::before {
+  counter-increment: navno;
+  content: counter(navno, decimal-leading-zero);
+  margin-right: 7px;
+  font-family: var(--font-num); font-weight: 900;
+  font-size: 10px; letter-spacing: .04em;
+  color: var(--muted);
+}
+.nav__links a.is-active::before { color: var(--ink); }
+
+/* ---- 角落 HUD（laxspace）：常驻学习数据 ---- */
+.hud {
+  position: fixed; right: 18px; bottom: 18px; z-index: 55;
+  display: flex; gap: 12px;
+  padding: 9px 14px;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-sm);
+  font-size: 11px; color: var(--ink-2);
+}
+.hud b { font-family: var(--font-num); font-weight: 900; font-size: 14px; color: var(--ink); margin-right: 3px; }
+@media (max-width: 900px) { .hud { display: none; } }
+
+/* ---- 开屏：纸片从中间撕开（itomdev） ---- */
+.intro__half { position: absolute; inset: 0; background: var(--canvas); z-index: 0; }
+.intro__half--l {
+  clip-path: polygon(0 0, 53% 0, 47% 11%, 54% 23%, 46% 35%, 53% 47%, 47% 59%, 54% 71%, 46% 83%, 52% 100%, 0 100%);
+}
+.intro__half--r {
+  clip-path: polygon(53% 0, 100% 0, 100% 100%, 52% 100%, 46% 83%, 54% 71%, 47% 59%, 53% 47%, 46% 35%, 54% 23%, 47% 11%);
+}
+.intro__inner, .intro__hint { position: relative; z-index: 1; }
+.intro.is-leaving .intro__half--l { transform: translateX(-102%); transition: transform .86s var(--ease-out); }
+.intro.is-leaving .intro__half--r { transform: translateX(102%); transition: transform .86s var(--ease-out); }
+.intro.is-leaving .intro__inner, .intro.is-leaving .intro__hint { opacity: 0; transition: opacity .28s var(--ease-out); }
+
+/* ---- 识宝描边：手绘感（itomdev）---- */
+.sb__ink { stroke-linejoin: round; stroke-linecap: round; opacity: .94; }
+.sb__white { stroke-linejoin: round; stroke-linecap: round; }
 
 /* ---- 藏宝阁：手机比例 + 纸板书架（本站 UI 语言） ---- */
 .vault { background: var(--paper); padding: clamp(64px,9vw,120px) 0; }

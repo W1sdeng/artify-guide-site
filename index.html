@@ -15,6 +15,9 @@
 
 <!-- 开屏页：一张会自己撕开的纸。只在本会话首次进站时出现 -->
 <div class="intro" id="intro" aria-hidden="true">
+  <span class="intro__half intro__half--l" aria-hidden="true"></span>
+  <span class="intro__half intro__half--r" aria-hidden="true"></span>
+
   <div class="intro__inner">
     <img class="intro__logo" src="assets/artify-wordmark.png" width="640" height="346" alt="artify">
     <div class="intro__text">
@@ -77,7 +80,7 @@
           <li><b>台词本</b>把好用的说法收进自己的本子，想用的时候翻得到</li>
         </ul>
         <div class="hero__actions">
-          <a class="btn btn--primary btn--lg magnetic" href="https://mhbwtjtchwrasnckoidt.supabase.co/storage/v1/object/public/app-updates/artify-1.0.102.apk">下载安卓版</a>
+          <a class="btn btn--primary btn--lg magnetic btn--reveal" href="https://mhbwtjtchwrasnckoidt.supabase.co/storage/v1/object/public/app-updates/artify-1.0.102.apk">下载安卓版</a>
           <a class="btn btn--ghost btn--lg" href="#concept">试滑一张卡</a>
         </div>
         <p class="hero__version">支持 Android 与 iOS</p>
@@ -373,7 +376,7 @@
         <h2 id="downloadTitle">下载文艺指南</h2>
         <p class="download__lead">支持 Android 与 iOS。</p>
         <div class="dl-actions">
-        <a class="btn btn--primary btn--xl magnetic" href="https://mhbwtjtchwrasnckoidt.supabase.co/storage/v1/object/public/app-updates/artify-1.0.102.apk">
+        <a class="btn btn--primary btn--xl magnetic btn--reveal" href="https://mhbwtjtchwrasnckoidt.supabase.co/storage/v1/object/public/app-updates/artify-1.0.102.apk">
           <svg class="icon btn__icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4v10"/><path d="m7.5 9.5 4.5 4.5 4.5-4.5"/><path d="M5 19h14"/></svg>
           下载安卓版 APK
         </a>
@@ -440,6 +443,12 @@
     <a class="btn btn--primary course-cta" id="courseCta" href="#download">去 App 里看</a>
   </div>
 </div>
+
+<aside class="hud" aria-hidden="true">
+  <span><b>1015</b>概念</span>
+  <span><b>1</b>连续</span>
+  <span><b>3</b>收藏</span>
+</aside>
 
 <span class="cursor-dot" id="cursorDot" aria-hidden="true"></span>
 

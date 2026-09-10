@@ -28,19 +28,13 @@
   function splitHero() {
     const title = $("#heroTitle");
     if (!title) return;
-    let ci = 0;
-    $$(".hero__line", title).forEach((line) => {
-      const text = line.textContent;
+    $$(".hero__line", title).forEach((line, i) => {
+      const inner = document.createElement("span");
+      inner.className = "hero__line-in";
+      inner.textContent = line.textContent;
       line.textContent = "";
-      const frag = document.createDocumentFragment();
-      for (const ch of text) {
-        const span = document.createElement("span");
-        span.className = "char";
-        span.style.setProperty("--ci", ci++);
-        span.textContent = ch;
-        frag.appendChild(span);
-      }
-      line.appendChild(frag);
+      line.appendChild(inner);
+      line.style.setProperty("--li", i);
     });
   }
   splitHero();
@@ -54,6 +48,26 @@
   const intro = $("#intro");
   let introDone = false;
   let heroStarted = false;
+
+  /* 导航项与 CTA 的 clip-path 揭示（trevornoah 手法） */
+  (function () {
+    const nav = $(".nav");
+    if (nav) requestAnimationFrame(() => nav.classList.add("is-ready"));
+    const reveals = $$(".btn--reveal");
+    if (reveals.length && "IntersectionObserver" in window) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((en) => {
+            if (en.isIntersecting) { en.target.classList.add("is-in"); io.unobserve(en.target); }
+          });
+        },
+        { threshold: 0.2 }
+      );
+      reveals.forEach((el) => io.observe(el));
+    } else {
+      reveals.forEach((el) => el.classList.add("is-in"));
+    }
+  })();
 
   function startHero() {
     if (heroStarted) return;
