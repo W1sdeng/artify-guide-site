@@ -425,7 +425,21 @@ html.js .hero__title.is-in .hero__line-in {
 @keyframes step-in {
   from { opacity: 0; transform: translateY(46px); }
 }
-.step__no { font-family: var(--font-num); font-weight: 900; font-size: 22px; line-height: 1; color: var(--ink); }
+.step__no {
+  display: grid; place-items: center; flex: none;
+  width: 46px; height: 46px;
+  border: 2px solid var(--ink); border-radius: 12px;
+  background: var(--paper-2);
+  font-family: var(--font-num); font-weight: 900; font-size: 18px; line-height: 1; color: var(--ink);
+  transition: background var(--dur-enter) var(--ease-out);
+}
+.step.is-lit .step__no { background: var(--step-accent, var(--lime)); }
+/* 五步各一色，横向推进时形成色谱 */
+.steps .step:nth-child(1) { --step-accent: var(--blue); }
+.steps .step:nth-child(2) { --step-accent: var(--aqua); }
+.steps .step:nth-child(3) { --step-accent: var(--yellow); }
+.steps .step:nth-child(4) { --step-accent: var(--pink); }
+.steps .step:nth-child(5) { --step-accent: var(--lime); }
 .step__body h3 { font-size: 20px; }
 .step__body p { margin-top: 6px; color: var(--ink-2); }
 
@@ -462,11 +476,10 @@ html.js .hero__title.is-in .hero__line-in {
 }
 .scene--pinned .step {
   flex: 0 0 auto;
-  width: min(380px, 32vw);
-  min-height: 240px;
-  align-items: center;
+  width: min(360px, 30vw);
+  min-height: 210px;
+  align-items: flex-start;
 }
-.scene--pinned .step__no { font-size: 30px; }
 .scene--pinned .steps.is-dealt .step { animation: none; }
 
 /* ---- 功能交替段 ---- */
