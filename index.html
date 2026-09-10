@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文艺指南 Artify - 帮年轻人在文艺场合不露馅</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #FFF9EC;
+            color: #2D2B2F;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .logo h1 {
+            font-size: 32px;
+            font-weight: 800;
+            color: #2D2B2F;
+            margin-bottom: 8px;
+        }
+        
+        .logo .subtitle {
+            font-size: 16px;
+            color: #74717B;
+        }
+        
+        .hero-image {
+            width: 100%;
+            border-radius: 20px;
+            margin-bottom: 32px;
+            background: linear-gradient(135deg, #92DDD1 0%, #92A7ED 100%);
+            height: 240px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .features {
+            margin-bottom: 40px;
+        }
+        
+        .features h2 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #2D2B2F;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 16px;
+            padding: 16px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-right: 16px;
+            flex-shrink: 0;
+        }
+        
+        .feature-icon.green { background: #CBEF72; }
+        .feature-icon.blue { background: #92A7ED; }
+        .feature-icon.pink { background: #E98BCF; }
+        .feature-icon.aqua { background: #92DDD1; }
+        
+        .feature-text h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #2D2B2F;
+        }
+        
+        .feature-text p {
+            font-size: 14px;
+            color: #74717B;
+            line-height: 1.5;
+        }
+        
+        .download-section {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .download-btn {
+            display: inline-block;
+            background: #CBEF72;
+            color: #2D2B2F;
+            font-size: 18px;
+            font-weight: 700;
+            padding: 16px 48px;
+            border-radius: 999px;
+            text-decoration: none;
+            border: 2px solid #2D2B2F;
+            box-shadow: 4px 4px 0 #2D2B2F;
+            transition: all 0.2s;
+        }
+        
+        .download-btn:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0 #2D2B2F;
+        }
+        
+        .download-btn:active {
+            transform: translate(4px, 4px);
+            box-shadow: 0 0 0 #2D2B2F;
+        }
+        
+        .version-info {
+            font-size: 14px;
+            color: #74717B;
+            margin-top: 16px;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 24px 0;
+            border-top: 1px solid #F3F0E8;
+            color: #74717B;
+            font-size: 14px;
+        }
+        
+        .footer a {
+            color: #92A7ED;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <h1>文艺指南</h1>
+            <p class="subtitle">帮年轻人在文艺场合「不露馅」</p>
+        </div>
+        
+        <div class="hero-image">
+            [App 界面截图]
+        </div>
+        
+        <div class="features">
+            <h2>核心功能</h2>
+            
+            <div class="feature-item">
+                <div class="feature-icon green">📝</div>
+                <div class="feature-text">
+                    <h3>现场题</h3>
+                    <p>6段式答题法，帮你掌握文艺场合的应对技巧</p>
+                </div>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon blue">🤖</div>
+                <div class="feature-text">
+                    <h3>文艺助手</h3>
+                    <p>AI智能问答，随时解答你的文艺疑惑</p>
+                </div>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon pink">💾</div>
+                <div class="feature-text">
+                    <h3>台词本</h3>
+                    <p>收藏经典表达，关键时刻不掉链子</p>
+                </div>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon aqua">🎯</div>
+                <div class="feature-text">
+                    <h3>个性化推荐</h3>
+                    <p>根据你的兴趣，推荐适合的学习内容</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="download-section">
+            <a href="https://mhbwtjtchwrasnckoidt.supabase.co/storage/v1/object/public/app-updates/app-debug.apk" class="download-btn">
+                下载最新版
+            </a>
+            <p class="version-info">版本 1.0.102 | 约 48MB | Android 7.0+</p>
+        </div>
+        
+        <div class="footer">
+            <p>© 2026 文艺指南 Artify</p>
+            <p>Made with ❤️ for art lovers</p>
+        </div>
+    </div>
+</body>
+</html>
