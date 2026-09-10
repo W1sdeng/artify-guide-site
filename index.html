@@ -99,8 +99,20 @@
       <div class="hero__media">
         <div class="phone" id="heroPhone">
           <div class="phone__screen">
-            <img src="assets/screenshot-today.webp" width="1080" height="2400" alt="文艺指南今日页的概念卡界面" decoding="async">
+            <div class="phone__track" id="heroTrack">
+              <img src="assets/screenshot-today.webp" width="1080" height="2400" alt="文艺指南今日页的概念卡界面" decoding="async" fetchpriority="high">
+              <img src="assets/screenshot-scene.webp" width="1080" height="2400" alt="文艺指南现场题界面" loading="lazy" decoding="async">
+              <img src="assets/screenshot-handbook.webp" width="1080" height="2400" alt="文艺指南手册与台词本界面" loading="lazy" decoding="async">
+              <img src="assets/screenshot-ai.webp" width="1080" height="2400" alt="文艺指南文艺助手界面" loading="lazy" decoding="async">
+            </div>
+            <button class="phone__arrow phone__arrow--prev" id="heroPrev" type="button" aria-label="上一张">
+              <svg class="icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M15 6l-6 6 6 6"/></svg>
+            </button>
+            <button class="phone__arrow phone__arrow--next" id="heroNext" type="button" aria-label="下一张">
+              <svg class="icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 6l6 6-6 6"/></svg>
+            </button>
           </div>
+          <div class="phone__dots" id="heroDots" aria-label="切换截图"></div>
         </div>
       </div>
     </div>

@@ -304,8 +304,24 @@ html.js .hero__title.is-in + .hero__underline path {
   /* 基础倾斜常驻（桌面视差在其上叠加） */
   transform: rotate(-3deg);
 }
-.phone__screen { border: 2px solid var(--ink); border-radius: 30px; overflow: hidden; background: var(--paper-2); }
-.phone__screen img { width: 100%; height: auto; }
+.phone__screen { position: relative; border: 2px solid var(--ink); border-radius: 30px; overflow: hidden; background: var(--paper-2); }
+.phone__track { display: flex; transition: transform .55s var(--ease-out); }
+.phone__track img { flex: 0 0 100%; width: 100%; height: auto; display: block; }
+.phone__arrow {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 3;
+  width: 30px; height: 30px; display: grid; place-items: center;
+  border: 2px solid var(--ink); border-radius: 50%;
+  background: var(--paper); box-shadow: var(--shadow-xs);
+  opacity: .92; transition: opacity var(--dur-press) var(--ease-out), transform var(--dur-press) var(--ease-out);
+}
+.phone__arrow:hover { opacity: 1; }
+.phone__arrow:active { transform: translateY(-50%) scale(.92); }
+.phone__arrow--prev { left: 8px; }
+.phone__arrow--next { right: 8px; }
+.phone__arrow .icon { width: 16px; height: 16px; }
+.phone__dots { display: flex; justify-content: center; gap: 7px; margin-top: 12px; }
+.phone__dot { width: 9px; height: 9px; padding: 0; border: 2px solid var(--ink); border-radius: 50%; background: var(--paper); cursor: pointer; transition: background var(--dur-press) var(--ease-out); }
+.phone__dot.is-current { background: var(--lime); }
 
 /* ---- 数据条 ---- */
 .stats { background: var(--paper-2); border-bottom: 2px solid var(--ink); }

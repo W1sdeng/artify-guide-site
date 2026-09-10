@@ -179,6 +179,72 @@
   updateScroll();
 
   /* ============================================================
+     首屏手机截图轮播：箭头 / 圆点 / 自动播 / 可拖
+     ============================================================ */
+  (function () {
+    const track = $("#heroTrack");
+    const prev = $("#heroPrev");
+    const next = $("#heroNext");
+    const dotsEl = $("#heroDots");
+    if (!track || !dotsEl) return;
+    const slides = $$("img", track);
+    const n = slides.length;
+    let i = 0;
+    let timer = null;
+    for (let k = 0; k < n; k++) {
+      const d = document.createElement("button");
+      d.type = "button";
+      d.className = "phone__dot";
+      d.setAttribute("aria-label", "第 " + (k + 1) + " 张截图");
+      d.addEventListener("click", () => go(k));
+      dotsEl.appendChild(d);
+    }
+    const dots = $$(".phone__dot", dotsEl);
+    function render() {
+      track.style.transform = "translateX(" + (-i * 100) + "%)";
+      dots.forEach((d, k) => d.classList.toggle("is-current", k === i));
+    }
+    function restart() {
+      if (timer) { clearInterval(timer); timer = null; }
+      if (reduce.matches) return;
+      timer = window.setInterval(() => go(i + 1), 4200);
+    }
+    function go(k) { i = (k % n + n) % n; render(); restart(); }
+    if (prev) prev.addEventListener("click", () => go(i - 1));
+    if (next) next.addEventListener("click", () => go(i + 1));
+    // 横向拖动换页
+    let drag = null;
+    track.addEventListener("pointerdown", (e) => {
+      if (reduce.matches) return;
+      drag = { x: e.clientX, id: e.pointerId };
+      track.style.transition = "none";
+      try { track.setPointerCapture(e.pointerId); } catch (_) {}
+    });
+    track.addEventListener("pointerup", (e) => {
+      if (!drag || e.pointerId !== drag.id) return;
+      const dx = e.clientX - drag.x;
+      drag = null;
+      track.style.transition = "";
+      if (Math.abs(dx) > 40) go(i + (dx < 0 ? 1 : -1));
+      else render();
+      restart();
+    });
+    // 离开首屏暂停自动播
+    const host = $("#heroPhone") || track;
+    if ("IntersectionObserver" in window) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((en) => {
+          if (en.isIntersecting) restart();
+          else if (timer) { clearInterval(timer); timer = null; }
+        });
+      }, { threshold: 0.2 });
+      io.observe(host);
+    }
+    render();
+    restart();
+  })();
+
+  /* ============================================================
      滚入错峰揭示
      ============================================================ */
   if ("IntersectionObserver" in window) {
