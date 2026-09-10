@@ -185,6 +185,7 @@
           <!-- 识宝演示：照片 → 识别 → 描边 → 抠图 → 说明 → 存进藏宝阁 -->
           <div class="shibao" id="shibao" role="img"
                aria-label="识宝演示：在展厅拍下画框，识宝描出画的轮廓并把它从照片里抠出来，结果存进藏宝阁">
+            <div class="shibao__screen">
             <div class="shibao__stage">
               <img class="shibao__scene" src="assets/shibao-scene.webp" width="1200" height="900"
                    loading="lazy" decoding="async"
@@ -218,6 +219,8 @@
                 <span class="shibao__vault-name">藏宝阁</span>
                 <span class="shibao__vault-count" id="shibaoCount">0</span>
               </div>
+            </div>
+            <div class="shibao__tray">
 
               <div class="shibao__sheet" aria-hidden="true">
                 <div class="shibao__sheet-head">
@@ -254,6 +257,7 @@
                 </div>
               </div>
             </div>
+          </div>
             <button class="btn btn--ghost shibao__replay" id="shibaoReplay" type="button">重放</button>
           </div>
         </div>

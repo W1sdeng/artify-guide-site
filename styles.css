@@ -439,23 +439,27 @@ html.js .hero__title .char { display: inline-block; opacity: 0; transform: trans
 }
 
 /* ---- 识宝：照片 -> 识别 -> 描边 -> 抠图 -> 说明 -> 藏宝阁 ---- */
-/* 竖屏手机比例：底部讲解卡才能长到接近整屏，看得清动画也读得全文字 */
-.shibao { width: min(100%, 430px); }
-.shibao__stage {
-  position: relative;
-  aspect-ratio: 1000 / 1780;
+/* 一整块「手机屏」：上半是识别画面（永不被遮），下半是滑入的讲解卡 */
+.shibao { width: min(100%, 440px); }
+.shibao__screen {
   border: 2px solid var(--ink);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-lg);
   overflow: hidden;
   background: var(--paper-2);
 }
+.shibao__stage {
+  position: relative;
+  aspect-ratio: 1200 / 900;
+  overflow: hidden;
+  border-bottom: 2px solid var(--ink);
+}
 .shibao__scene { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
 /* 抠图完成时压暗背景，把注意力交给抠出来的画 */
 .shibao__scrim {
   position: absolute; inset: 0;
-  background: rgba(37, 37, 39, .5);
+  background: rgba(37, 37, 39, .38);
   opacity: 0; transition: opacity .5s var(--ease-out);
 }
 .shibao.is-cutting .shibao__scrim { opacity: 1; }
@@ -463,7 +467,7 @@ html.js .hero__title .char { display: inline-block; opacity: 0; transform: trans
 /* 抠图区：位置与展厅照里画作的位置严格对齐（352,132,560,700 / 1200x900） */
 .shibao__cutwrap {
   position: absolute;
-  left: 17.6%; top: 18.539%; width: 64.8%; height: 45.506%;
+  left: 29.333%; top: 14.667%; width: 46.667%; height: 77.778%;
   transform-origin: 88% 4%;
   transition: transform .6s var(--ease-spring), opacity .45s var(--ease-out), filter .45s var(--ease-out);
 }
@@ -477,7 +481,7 @@ html.js .hero__title .char { display: inline-block; opacity: 0; transform: trans
 /* 存进藏宝阁：主体留在原处，飞一个副本过去 */
 .shibao__fly {
   position: absolute;
-  left: 17.6%; top: 18.539%; width: 64.8%; height: 45.506%;
+  left: 29.333%; top: 14.667%; width: 46.667%; height: 77.778%;
   object-fit: contain;
   opacity: 0; pointer-events: none;
   transform-origin: 88% 4%;
@@ -557,27 +561,30 @@ html.js .hero__title .char { display: inline-block; opacity: 0; transform: trans
 .shibao.is-vaulting .shibao__vault { transform: scale(1.12); }
 .shibao.is-vaulting .shibao__vault-count { color: var(--purple); }
 
-/* 底部讲解卡：内容与 App 的分段一致，长卡从下往上滑出，内部可滚 */
-.shibao__sheet {
-  position: absolute; left: 0; right: 0; bottom: 0;
-  max-height: 88%;
-  padding: 18px 20px 24px;
+/* 下半：讲解卡视口。卡片在这里从下方滑入，被裁在本区内，绝不会盖住上面的识别画面 */
+.shibao__tray {
+  position: relative;
+  height: 566px;
+  overflow: hidden;
   background: var(--paper);
-  border-top: 2px solid var(--ink);
-  border-radius: 16px 16px 0 0;
+}
+.shibao__sheet {
+  position: absolute; inset: 0;
+  padding: 16px 18px 20px;
+  background: var(--paper);
   overflow-y: auto;
   overscroll-behavior: contain;
   transform: translateY(101%);
   transition: transform .52s var(--ease-spring);
 }
 .shibao.is-lifted .shibao__sheet { transform: none; }
-.shibao__sheet-head { padding-bottom: 12px; border-bottom: 2px solid var(--paper-2); }
-.shibao__sheet-name { font-size: 21px; font-weight: 800; }
-.shibao__sheet-meta { margin-top: 4px; font-size: 12.5px; color: var(--muted); }
-.shibao__sec { margin-top: 14px; opacity: 0; transform: translateY(10px); transition: opacity .4s var(--ease-out), transform .5s var(--ease-spring); transition-delay: var(--d, 0ms); }
+.shibao__sheet-head { padding-bottom: 10px; border-bottom: 2px solid var(--paper-2); }
+.shibao__sheet-name { font-size: 20px; font-weight: 800; }
+.shibao__sheet-meta { margin-top: 3px; font-size: 12px; color: var(--muted); }
+.shibao__sec { margin-top: 11px; opacity: 0; transform: translateY(10px); transition: opacity .4s var(--ease-out), transform .5s var(--ease-spring); transition-delay: var(--d, 0ms); }
 .shibao.is-lifted .shibao__sec { opacity: 1; transform: none; }
-.shibao__sec-t { font-size: 12px; font-weight: 800; letter-spacing: .06em; color: var(--purple); }
-.shibao__sec-b { margin-top: 4px; font-size: 13.5px; line-height: 1.7; color: var(--ink-2); }
+.shibao__sec-t { font-size: 11.5px; font-weight: 800; letter-spacing: .06em; color: var(--purple); }
+.shibao__sec-b { margin-top: 3px; font-size: 12.5px; line-height: 1.62; color: var(--ink-2); }
 .shibao__tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 6px; }
 .shibao__tags span {
   padding: 3px 9px;
