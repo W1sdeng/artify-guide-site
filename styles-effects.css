@@ -1,0 +1,226 @@
+/* ============================================================
+   文艺指南 Artify 官网 · 参考站效果层
+   只新增视觉与交互；不改动 styles.css 的 token 与布局。
+   必须在 styles.css 之后加载，才能覆盖同名选择器。
+   动画只用 transform / opacity / clip-path；
+   颜色一律取现有 CSS 变量，缓动取 --ease-spring / --ease-out。
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   1. 按钮手绘歪边
+   非对称圆角制造「手撕纸边」感；hover 轻微抬起。
+   .shibao__replay 是圆形重放钮，必须排除，否则圆会变成歪边。
+   :not(:active) 保证按下时仍走 styles.css 的 :active 反馈。
+   ------------------------------------------------------------ */
+.btn:not(.shibao__replay) {
+  border-radius: 2px 255px 3px 255px / 255px 3px 225px 5px;
+}
+.btn:not(:active):hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+/* ------------------------------------------------------------
+   2. 章节标题下方手绘下划线
+   波浪线用 data-URI 内联 SVG 作为 mask（保证颜色仍取变量），
+   h2 本身的颜色来自 --lime。
+   进入视口时由 effects.js 加 .fx-in，用 clip-path 从右往左擦出。
+   注：CSS 背景图无法动画 stroke-dashoffset，这里用允许列表内的
+   clip-path 实现「抽屉式画出」；若必须用 stroke-dashoffset，
+   需在 HTML 里放真实内联 <svg>（与「不改 index.html」冲突）。
+   ------------------------------------------------------------ */
+main section h2::after {
+  content: "";
+  display: block;
+  width: min(230px, 54%);
+  height: 12px;
+  margin-top: 10px;
+  background: var(--lime);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 12' preserveAspectRatio='none'%3E%3Cpath d='M2 8C40 2 78 3 112 6s72 6 126-2' fill='none' stroke='%23000' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E");
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: left center;
+  -webkit-mask-size: 100% 100%;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 12' preserveAspectRatio='none'%3E%3Cpath d='M2 8C40 2 78 3 112 6s72 6 126-2' fill='none' stroke='%23000' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E");
+  mask-repeat: no-repeat;
+  mask-position: left center;
+  mask-size: 100% 100%;
+  pointer-events: none;
+}
+/* 只有 JS 可用时才先藏起来；无 JS 时下划线直接可见 */
+html.js main section h2::after {
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path .72s var(--ease-out);
+}
+html.js main section h2.fx-in::after {
+  clip-path: inset(0 0 0 0);
+}
+
+/* ------------------------------------------------------------
+   3. 安装步骤 hover：白块从顶扫下 + difference 反色
+   伪元素压住整块内容，用 difference 正片叠底的是一种「反色扫光」。
+   isolation 把混合关在卡片内部，overflow 裁掉扫下来的那块。
+   ------------------------------------------------------------ */
+.install__step {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.install__step::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--paper);
+  transform: translateY(-101%);
+  transition: transform .46s var(--ease-out);
+  mix-blend-mode: difference;
+  pointer-events: none;
+}
+.install__step:hover::before {
+  transform: translateY(0);
+}
+
+/* ------------------------------------------------------------
+   4. 常见问题箭头翻面入场
+   初态 rotateX(90deg) 侧对屏幕，随所在 .faq__item 进入视口翻正。
+   [open] 的 90 度旋转写在最后，保证展开时仍然生效。
+   ------------------------------------------------------------ */
+html.js .faq__item.fx-rise summary::after {
+  transform: rotateX(90deg);
+  transition: transform .5s var(--ease-spring);
+}
+html.js .faq__item.fx-in summary::after {
+  transform: rotateX(0deg);
+}
+html.js .faq__item[open] summary::after {
+  transform: rotate(90deg);
+}
+
+/* ------------------------------------------------------------
+   5. 逐行幕布揭示
+   安装步骤与常见问题初始下沉，进入视口后逐条上浮。
+   错峰延迟直接复用 HTML 里已有的 --d（没有则 0）。
+   选择器同时带 .reveal 且在本文件之后，故优先于 .reveal.is-in。
+   ------------------------------------------------------------ */
+html.js .reveal.fx-rise {
+  opacity: 0;
+  transform: translateY(34px);
+  transition: opacity .5s var(--ease-out), transform .62s var(--ease-spring);
+  transition-delay: var(--d, 0s);
+}
+html.js .reveal.fx-rise.fx-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* ------------------------------------------------------------
+   6. 概念卡与截图框的纸纹
+   纯 CSS 渐变叠一层极淡纹理，无外部图片。
+   注意：.shot > img 的高度规则只作用直接子图，伪元素不参与，
+   所以嵌套的识宝 / 藏宝阁图不会被改高。
+   ------------------------------------------------------------ */
+.card,
+.shot {
+  position: relative;
+}
+.card::after,
+.shot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  background-image:
+    radial-gradient(var(--ink) 0.6px, transparent 0.7px),
+    repeating-linear-gradient(0deg, var(--ink) 0 0.6px, transparent 0.6px 4px);
+  background-size: 7px 7px, 100% 4px;
+  opacity: .03;
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------
+   7. 藏宝阁作品折角
+   右上角被「折起」：::before 盖住被翻走的那枚三角（取纸色，
+   与书架同底），::after 画出翻折回来的纸背，两枚三角形沿对角线
+   拼合，形成折角。不取 .card，避免误伤概念卡。
+   只切伪元素、不裁 img，保留作品自带的硬阴影。
+   ------------------------------------------------------------ */
+.piece {
+  position: relative;
+}
+@media (hover: hover) {
+  .piece::before,
+  .piece::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 15px;
+    height: 15px;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 2;
+    transition: opacity .24s var(--ease-out), transform .4s var(--ease-spring);
+  }
+  /* 被翻走的角：纸色盖住，和书架背景连成一片 */
+  .piece::before {
+    background: var(--paper);
+    clip-path: polygon(0 0, 100% 0, 100% 100%);
+  }
+  /* 翻回来的纸背：沿对角线铺一枚略深的三角当折痕 */
+  .piece::after {
+    background: linear-gradient(315deg, var(--paper-2) 0%, var(--paper) 72%);
+    clip-path: polygon(0 0, 0 100%, 100% 100%);
+    transform-origin: 100% 0;
+    transform: scale(.7);
+  }
+  .piece:hover::before {
+    opacity: 1;
+  }
+  .piece:hover::after {
+    opacity: 1;
+    transform: translateY(-6px) scale(.96);
+  }
+  .piece:hover img {
+    transform: translateY(-6px);
+  }
+}
+
+/* ============================================================
+   降低动效偏好：每个效果都给一个静态或直达终态的降级
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  /* 1 按钮：不做抬起位移 */
+  .btn:not(:active):hover {
+    transform: none;
+  }
+  /* 2 下划线：直接完整显示 */
+  html.js main section h2::after {
+    clip-path: inset(0 0 0 0);
+    transition: none;
+  }
+  /* 3 扫光：整套去掉，不留瞬时闪白 */
+  .install__step::before {
+    display: none;
+  }
+  /* 4 箭头：不做翻面，直接朝右 */
+  html.js .faq__item.fx-rise summary::after,
+  html.js .faq__item.fx-in summary::after {
+    transform: rotateX(0deg);
+    transition: none;
+  }
+  /* 5 揭示：直接到位 */
+  html.js .reveal.fx-rise {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  /* 7 折角：折角立刻出现，不做抬起位移 */
+  .piece::before,
+  .piece::after {
+    transition: none;
+  }
+  .piece:hover img {
+    transform: none;
+  }
+}
