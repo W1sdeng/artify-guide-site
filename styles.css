@@ -764,8 +764,10 @@ html.js .hero__title.is-in .hero__line-in {
 }
 
 /* ---- clip-path 揭示（trevornoah）：按钮从右往左刷出，导航项逐个刷出 ---- */
-html.js .btn--reveal { clip-path: inset(0 100% 0 0 round 16px); transition: clip-path .72s var(--ease-out); }
-html.js .btn--reveal.is-in { clip-path: inset(0 0 0 0 round 16px); }
+/* 揭示不再用 clip-path：它会把按钮外部的 ink 底座一起裁掉。
+   改用透明度 + 上浮 + 轻微缩放的揭示，底座完整保留。 */
+html.js .btn--reveal { opacity: 0; transform: translateY(10px); transition: opacity .5s var(--ease-out), transform .6s var(--ease-spring); }
+html.js .btn--reveal.is-in { opacity: 1; transform: none; transition: transform var(--dur-press) var(--ease-out), background var(--dur-press) var(--ease-out); }
 html.js .nav__links a { clip-path: inset(0 100% 0 0); transition: clip-path .55s var(--ease-out); }
 html.js .nav.is-ready .nav__links a { clip-path: inset(0 0 0 0); }
 html.js .nav.is-ready .nav__links a:nth-child(2) { transition-delay: .07s; }
@@ -928,6 +930,7 @@ html.js .nav.is-ready .nav__links a:nth-child(7) { transition-delay: .42s; }
   border-radius: var(--radius-card);
   color: var(--ink-2);
   font-size: 17px; font-weight: 700;
+  box-shadow: 0 4px 0 rgba(37, 37, 39, .22);
 }
 .download__qr { display: flex; flex-direction: column; align-items: center; gap: 12px; }
 .qr-card { padding: 14px; background: var(--paper); border: 2px solid var(--ink); border-radius: var(--radius-card); box-shadow: var(--shadow-lg); }
@@ -940,7 +943,9 @@ html.js .nav.is-ready .nav__links a:nth-child(7) { transition-delay: .42s; }
   padding: 20px 22px;
   background: var(--paper); border: 2px solid var(--ink);
   border-radius: var(--radius-card); box-shadow: var(--shadow-sm);
+  transition: transform var(--dur-press) var(--ease-out), box-shadow var(--dur-press) var(--ease-out);
 }
+.install__step:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
 .install__no { font-family: var(--font-num); font-weight: 900; font-size: 24px; line-height: 1; }
 .install__step p { font-weight: 700; }
 
@@ -952,7 +957,10 @@ html.js .nav.is-ready .nav__links a:nth-child(7) { transition-delay: .42s; }
   background: var(--paper); border: 2px solid var(--ink);
   border-radius: var(--radius-card); box-shadow: var(--shadow-xs);
   overflow: hidden;
+  transition: transform var(--dur-press) var(--ease-out), box-shadow var(--dur-press) var(--ease-out), border-color var(--dur-press) var(--ease-out);
 }
+.faq__item:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+.faq__item[open] { box-shadow: var(--shadow-sm); }
 .faq__item summary {
   list-style: none; cursor: pointer;
   padding: 18px 22px; font-weight: 700; font-size: 17px;
