@@ -19,6 +19,8 @@
       build-assets.py   从 source-screens 生成 WebP / 字标 / 二维码 / favicon
       build-shibao.py   合成识宝演示素材（展厅照 / 抠图 / 轮廓）
       subset-fonts.py   按页面实际用字生成字体子集
+      shots.mjs         半自动页面截图（headless Chrome + CDP，输出到 tools/shots）
+      check-assets.mjs  资源与链接自检
       source-screens/   真机截图原图（1080x2400，安卓模拟器实拍）
 
 ## 本地预览
@@ -48,6 +50,25 @@
 改过页面文案后，字体子集需要重跑，否则新出现的字可能缺字形：
 
     <venv-python> tools/subset-fonts.py
+
+### 页面截图
+
+想在本地截几张图预览或存档，先起本地服务，再跑截图脚本：
+
+    py -3 -m http.server 8777 --bind 127.0.0.1 --directory .
+    node tools/shots.mjs
+
+`tools/shots.mjs` 用系统 Chrome 的 headless 模式（零第三方依赖、无需构建），
+默认滚动到首屏 / 概念卡 / 现场题 / 识宝 / 下载 / FAQ 六个锚点各截一张，png 存进 `tools/shots/`。
+常用参数：
+
+    --url <地址>       页面地址，默认 http://127.0.0.1:8777/
+    --out-dir <目录>   输出目录，默认 tools/shots
+    --width / --height / --dsf   视口尺寸与像素比，默认 1440x900、1 倍
+    --shot 名字=选择器  自定义截图，可重复；给了就不再截默认六张
+    --help             查看全部参数
+
+Chrome 默认取 `C:\Program Files\Google\Chrome\Application\chrome.exe`，可用 `CHROME` 环境变量覆盖。
 
 ## 发布
 

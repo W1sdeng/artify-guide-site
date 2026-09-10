@@ -12,7 +12,12 @@
 
   const countEl = document.getElementById("shibaoCount");
   const replayBtn = document.getElementById("shibaoReplay");
+  const shelf = document.getElementById("shelf");
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  // 飞入临时层：克隆手机里的抠图，落到书柜第一幅作品的位置
+  let ghost = null;
+  let flyTimer = null;
 
   // 时间轴：毫秒 -> 要加上的 class
   const STEPS = [
@@ -40,15 +45,61 @@
     if (countEl) countEl.textContent = String(n);
   }
 
+  function clearFly() {
+    if (ghost) { ghost.remove(); ghost = null; }
+    if (flyTimer) { clearTimeout(flyTimer); flyTimer = null; }
+  }
+
+  function land() {
+    if (shelf) shelf.classList.add("is-landed");
+  }
+
   function reset() {
     CLASSES.forEach((c) => root.classList.remove(c));
     setCount(0);
+    clearFly();
+    if (shelf) shelf.classList.remove("is-landed");
   }
 
   function finish() {
-    // 减动效 / 不支持时：直接给终态
+    // 减动效 / 不支持时：直接给终态，不飞
     CLASSES.forEach((c) => root.classList.add(c));
     setCount(1);
+    land();
+  }
+
+  // 抠图从手机飞向书柜第一幅作品；落位后给书柜加 is-landed 触发轻微回弹
+  function fly() {
+    if (reduce.matches) { land(); return; }
+    clearFly();
+    const cut = root.querySelector(".sb__cut");
+    const target = shelf && shelf.querySelector(".piece img");
+    if (!cut || !target) { land(); return; }
+    const from = cut.getBoundingClientRect();
+    const to = target.getBoundingClientRect();
+    if (!from.width || !from.height || !to.width || !to.height) { land(); return; }
+
+    ghost = cut.cloneNode(true);
+    ghost.className = "sb__cut sb__fly";
+    ghost.style.opacity = "1";
+    ghost.style.left = from.left + "px";
+    ghost.style.top = from.top + "px";
+    ghost.style.width = from.width + "px";
+    ghost.style.height = from.height + "px";
+    document.body.appendChild(ghost);
+
+    const dx = to.left - from.left;
+    const dy = to.top - from.top;
+    const s = to.width / from.width;
+    const el = ghost;
+    // 先落在起点，下一帧再起飞，过渡才会跑
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (!el.isConnected) return;
+        el.style.transform = "translate(" + dx + "px," + dy + "px) scale(" + s + ")";
+      });
+    });
+    flyTimer = window.setTimeout(() => { flyTimer = null; clearFly(); land(); }, 640);
   }
 
   function play() {
@@ -58,7 +109,10 @@
     // 强制回流，保证 reset 先生效、过渡能重新跑
     void root.offsetWidth;
     STEPS.forEach(([t, cls]) => {
-      timers.push(window.setTimeout(() => root.classList.add(cls), t));
+      timers.push(window.setTimeout(() => {
+        root.classList.add(cls);
+        if (cls === "is-vaulting") fly();
+      }, t));
     });
     vaultTimer = window.setTimeout(() => setCount(1), 3980);
   }

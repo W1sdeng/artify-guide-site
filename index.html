@@ -41,10 +41,9 @@
     <nav class="nav__links" aria-label="主导航">
       <a href="#concept">概念卡</a>
       <a href="#scene">现场题</a>
-      <a href="#feature-shibao">识宝</a>
+      <a href="#feature-shibao">识宝 · 藏宝阁</a>
       <a href="#handbook">台词本</a>
       <a href="#feature-ai">文艺助手</a>
-      <a href="#vault">藏宝阁</a>
       <a href="#download">下载</a>
       <a href="#faq">常见问题</a>
     </nav>
@@ -60,10 +59,9 @@
     <nav class="nav__drawer-links" aria-label="移动端导航">
       <a href="#concept">概念卡</a>
       <a href="#scene">现场题</a>
-      <a href="#feature-shibao">识宝</a>
+      <a href="#feature-shibao">识宝 · 藏宝阁</a>
       <a href="#handbook">台词本</a>
       <a href="#feature-ai">文艺助手</a>
-      <a href="#vault">藏宝阁</a>
       <a href="#download">下载</a>
       <a href="#faq">常见问题</a>
       <a class="btn btn--primary" href="https://mhbwtjtchwrasnckoidt.supabase.co/storage/v1/object/public/app-updates/artify-1.0.102.apk">下载安卓版</a>
@@ -206,7 +204,7 @@
             <li><svg class="icon tick__icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 13l4 4 10-10"/></svg>再告诉你「怎么看」，以及一句现场能用的话</li>
           </ul>
         </div>
-        <div class="feature__media">
+        <div class="feature__media feature__media--shibao">
           <!-- 识宝：手机屏 UI。背景高斯模糊，中间清晰区做识别与抠图；完成后抠好的图上升，讲解从下滑入 -->
           <div class="shot shibao" id="shibao" role="img"
                aria-label="识宝：在展厅拍下画框，描出画的轮廓并抠出来，给出讲解，再收进藏宝阁">
@@ -278,10 +276,43 @@
                   <p class="sb__tags"><span>印象派</span><span>笔触</span><span>光色关系</span><span>观看距离</span></p>
                 </div></div>
             </div>
+            <button class="btn btn--ghost shibao__replay" id="shibaoReplay" type="button" aria-label="重放">
+              <svg class="icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v4h-4"/></svg>
+            </button>
           </div>
-          <button class="btn btn--ghost shibao__replay" id="shibaoReplay" type="button" aria-label="重放">
-            <svg class="icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v4h-4"/></svg>
-          </button>
+
+          <!-- 藏宝阁：识宝抠下来的作品，像书柜一样一幅幅摆着 -->
+          <div class="shot case" id="shelf">
+            <div class="case__room">
+              <div class="case__bar">
+                <span class="case__title">藏宝阁</span>
+                <span class="case__count">已收藏 <b id="vaultCount">0</b></span>
+              </div>
+              <div class="case__shelf">
+                <div class="case__row">
+                  <figure class="piece" style="--i:0">
+                    <img src="assets/shibao-cut.webp" width="760" height="950" loading="lazy" decoding="async" alt="《睡莲》，莫奈，1899">
+                    <figcaption>睡莲 · 1899</figcaption>
+                  </figure>
+                  <figure class="piece" style="--i:1">
+                    <img src="assets/vault-2.webp" width="760" height="950" loading="lazy" decoding="async" alt="《睡莲》，莫奈，1915">
+                    <figcaption>睡莲 · 1915</figcaption>
+                  </figure>
+                  <figure class="piece" style="--i:2">
+                    <img src="assets/vault-3.webp" width="760" height="950" loading="lazy" decoding="async" alt="《维特伊》，莫奈，1880">
+                    <figcaption>维特伊 · 1880</figcaption>
+                  </figure>
+                </div>
+                <div class="case__board" aria-hidden="true"></div>
+                <div class="case__row case__row--empty" aria-hidden="true">
+                  <span class="slot"></span><span class="slot"></span><span class="slot"></span>
+                </div>
+                <div class="case__board" aria-hidden="true"></div>
+              </div>
+              <p class="case__hint">架子还没满。去展馆拍一件，识宝会把它放上来。</p>
+            </div>
+          </div>
+        </div>
       </article>
 
       <article class="feature reveal" id="handbook">
@@ -333,48 +364,6 @@
           </div>
         </div>
       </article>
-    </div>
-  </section>
-
-  <!-- 藏宝阁：识宝抠下来的作品，像书柜一样一幅幅摆着 -->
-  <section class="vault" id="vault" aria-labelledby="vaultTitle">
-    <div class="wrap">
-      <header class="section-head reveal">
-        <p class="overline overline--swatch" style="--sec: var(--purple)">藏宝阁</p>
-        <h2 id="vaultTitle">看过的，都摆在你自己的书架上</h2>
-        <p class="section-sub">识宝抠下来的作品会自动收进藏宝阁。像一间只属于你的小书房，一幅一幅，慢慢攒。</p>
-      </header>
-
-      <div class="shot case" id="shelf">
-        <div class="case__room">
-          <div class="case__bar">
-            <span class="case__title">藏宝阁</span>
-            <span class="case__count">已收藏 <b id="vaultCount">0</b></span>
-          </div>
-          <div class="case__shelf">
-            <div class="case__row">
-              <figure class="piece" style="--i:0">
-                <img src="assets/shibao-cut.webp" width="760" height="950" loading="lazy" decoding="async" alt="《睡莲》，莫奈，1899">
-                <figcaption>睡莲 · 1899</figcaption>
-              </figure>
-              <figure class="piece" style="--i:1">
-                <img src="assets/vault-2.webp" width="760" height="950" loading="lazy" decoding="async" alt="《睡莲》，莫奈，1915">
-                <figcaption>睡莲 · 1915</figcaption>
-              </figure>
-              <figure class="piece" style="--i:2">
-                <img src="assets/vault-3.webp" width="760" height="950" loading="lazy" decoding="async" alt="《维特伊》，莫奈，1880">
-                <figcaption>维特伊 · 1880</figcaption>
-              </figure>
-            </div>
-            <div class="case__board" aria-hidden="true"></div>
-            <div class="case__row case__row--empty" aria-hidden="true">
-              <span class="slot"></span><span class="slot"></span><span class="slot"></span>
-            </div>
-            <div class="case__board" aria-hidden="true"></div>
-          </div>
-          <p class="case__hint">架子还没满。去展馆拍一件，识宝会把它放上来。</p>
-        </div>
-      </div>
     </div>
   </section>
 

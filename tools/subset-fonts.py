@@ -22,7 +22,7 @@ FANGYUAN_REGULAR = os.path.join(APP_FONT_DIR, "alimama_fangyuan_regular.ttf")
 FANGYUAN_BOLD = os.path.join(APP_FONT_DIR, "alimama_fangyuan_bold.ttf")
 MONTSERRAT = os.path.join(APP_FONT_DIR, "montserrat_variable.ttf")
 
-TEXT_SOURCES = ["index.html", "styles.css", "main.js"]
+TEXT_SOURCES = ["index.html", "privacy.html", "terms.html", "styles.css", "main.js"]
 
 # 兜底字符：ASCII 可打印 + 常用中文标点与符号，防止后续微调文案时缺字
 EXTRA = (
