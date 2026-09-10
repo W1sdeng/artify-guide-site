@@ -157,14 +157,15 @@
       const p = max > 0 ? d.scrollTop / max : 0;
       progressBar.style.transform = "scaleX(" + p + ")";
     }
-    // 视差只在桌面跑：移动端每帧写 transform/变量会拖慢滚动
-    if (reduce.matches || !wideMQ.matches) return;
+    if (reduce.matches) return;
     const doc = document.documentElement;
     const y = doc.scrollTop;
+    // 手机随滚动轻微旋转：单元素 transform，合成器友好，移动端也保留
     if (heroPhone) {
       heroPhone.style.transform = "translate3d(0," + (y * 0.1) + "px,0) rotate(" + (-3 + y * 0.015) + "deg)";
     }
-    // 装饰色块随滚动轻微视差，走 CSS 变量，保留各自基础变换
+    // 装饰色块视差只在桌面：移动端多个元素每帧写 CSS 变量会拖慢滚动
+    if (!wideMQ.matches) return;
     decor.forEach((el, i) => {
       el.style.setProperty("--py", y * (0.04 + i * 0.02) + "px");
     });
