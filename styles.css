@@ -273,6 +273,12 @@ html.js .hero__title.is-in .hero__line-in {
   height: 14px; margin-top: 6px;
   fill: none; stroke: var(--lime); stroke-width: 6; stroke-linecap: round;
 }
+/* 标题逐行入场后，下划线再"画"出来，形成联动 */
+html.js .hero__underline path { stroke-dasharray: 1; stroke-dashoffset: 1; }
+html.js .hero__title.is-in + .hero__underline path {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset .62s var(--ease-out) .34s;
+}
 /* 首屏底部的滚动提示 */
 .hero__cue {
   position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%);
@@ -347,11 +353,24 @@ html.js .hero__title.is-in .hero__line-in {
   animation-delay: calc(var(--i, 0) * 110ms);
 }
 @keyframes card-deal {
-  from {
+  0% {
     opacity: 0;
     transform: translate(-50%, -50%)
                translate(calc(var(--x, 0px) + 170px), var(--y, 0px))
                rotate(calc(var(--r, 0deg) + 8deg)) scale(calc(var(--s, 1) * .94));
+  }
+  /* 落地先过冲一点再归位，形成回弹 */
+  72% {
+    opacity: 1;
+    transform: translate(-50%, -50%)
+               translate(var(--x, 0px), calc(var(--y, 0px) - 7px))
+               rotate(calc(var(--r, 0deg) - 1deg)) scale(calc(var(--s, 1) * 1.025));
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%)
+               translate(var(--x, 0px), var(--y, 0px))
+               rotate(var(--r, 0deg)) scale(var(--s, 1));
   }
 }
 .card.is-dragging { cursor: grabbing; box-shadow: 9px 12px 0 var(--ink); }
