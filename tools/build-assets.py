@@ -50,7 +50,9 @@ def build_screenshots() -> None:
 
 
 def build_wordmark() -> None:
-    im = Image.open(os.path.join(APP_RES, "artify_logo_transparent.png")).convert("RGBA")
+    # 用官方完整品牌标（字标 + 蓝弧/紫点/青胶囊/蓝星）。
+    # artify_logo_transparent.png 是旧版，边缘有抠图残留，不要用。
+    im = Image.open(os.path.join(APP_RES, "artify_logo_vector.png")).convert("RGBA")
     im = im.crop(im.split()[3].getbbox())  # 裁掉透明边
     width = 640
     im = im.resize((width, round(im.height * width / im.width)), Image.LANCZOS)

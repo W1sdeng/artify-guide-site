@@ -364,6 +364,64 @@ html.js .hero__title .char { display: inline-block; opacity: 0; transform: trans
 .bubble--user { background: var(--purple); color: var(--paper); border-bottom-right-radius: 4px; }
 .bubble--bot { background: var(--aqua); color: var(--ink); border-bottom-left-radius: 4px; }
 
+/* ---- 识宝：取景框 + 识别结果 ---- */
+.scan {
+  width: min(100%, 420px);
+  display: grid; gap: 0;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+.scan__shot {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  display: grid; place-items: center;
+  background: var(--paper-2);
+  border-bottom: 2px solid var(--ink);
+}
+/* 取景框四角 */
+.scan__corner { position: absolute; width: 22px; height: 22px; border: 3px solid var(--ink); }
+.scan__corner--tl { top: 12px; left: 12px; border-right: 0; border-bottom: 0; border-radius: 6px 0 0 0; }
+.scan__corner--tr { top: 12px; right: 12px; border-left: 0; border-bottom: 0; border-radius: 0 6px 0 0; }
+.scan__corner--bl { bottom: 12px; left: 12px; border-right: 0; border-top: 0; border-radius: 0 0 0 6px; }
+.scan__corner--br { bottom: 12px; right: 12px; border-left: 0; border-top: 0; border-radius: 0 0 6px 0; }
+/* 取景框里的展品剪影 */
+.scan__subject {
+  width: 38%;
+  aspect-ratio: 1 / 1.18;
+  background: var(--lilac);
+  border: 2px solid var(--ink);
+  border-radius: 46% 46% 40% 40% / 32% 32% 58% 58%;
+}
+.scan__hint {
+  position: absolute; bottom: 14px;
+  font-size: var(--fs-caption); letter-spacing: .12em; color: var(--muted);
+}
+.scan__badge {
+  position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+  padding: 4px 12px;
+  background: var(--lime);
+  border: 2px solid var(--ink); border-radius: var(--radius-tag);
+  font-size: 12px; font-weight: 700;
+}
+.scan__result { padding: 20px; }
+.scan__name { font-size: 22px; font-weight: 800; }
+.scan__tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.scan__tags span {
+  padding: 3px 10px;
+  background: var(--paper-2);
+  border: 2px solid var(--ink); border-radius: var(--radius-tag);
+  font-size: 12px; font-weight: 700;
+}
+.scan__say {
+  margin-top: 14px;
+  padding-left: 14px;
+  border-left: 3px solid var(--yellow);
+  font-size: 15px; line-height: 1.7; color: var(--ink-2);
+}
+
 /* ---- 关键词跑马灯 ---- */
 .marquee { overflow: hidden; background: var(--paper-2); border-block: 2px solid var(--ink); }
 .marquee__track {
