@@ -12,6 +12,20 @@
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
+<!-- 开屏页：一张会自己撕开的纸。只在本会话首次进站时出现 -->
+<div class="intro" id="intro" aria-hidden="true">
+  <div class="intro__inner">
+    <img class="intro__logo" src="assets/artify-wordmark.png" width="640" height="346" alt="artify">
+    <div class="intro__text">
+      <span class="intro__rule" aria-hidden="true"></span>
+      <p class="intro__title">文艺指南</p>
+      <p class="intro__sub">帮年轻人在文艺场合，不露馅</p>
+    </div>
+  </div>
+  <p class="intro__hint">点任意处进入</p>
+</div>
+
 <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
 
 <header class="nav" id="top">
@@ -61,7 +75,7 @@
           <a class="btn btn--primary btn--lg magnetic" href="https://mhbwtjtchwrasnckoidt.supabase.co/storage/v1/object/public/app-updates/app-debug.apk">下载安卓版</a>
           <a class="btn btn--ghost btn--lg" href="#concept">试滑一张卡</a>
         </div>
-        <p class="hero__version">Android 7.0+ · iOS 版开发中</p>
+        <p class="hero__version">支持 Android 与 iOS</p>
       </div>
       <div class="hero__media">
         <div class="phone" id="heroPhone">
@@ -87,7 +101,7 @@
   <section class="theater" id="concept" aria-labelledby="conceptTitle">
     <div class="wrap">
       <header class="section-head reveal">
-        <p class="overline">右滑 / 左滑</p>
+        <p class="overline overline--swatch" style="--sec: var(--aqua)">右滑 / 左滑</p>
         <h2 id="conceptTitle">一次只给你一张卡</h2>
         <p class="section-sub">和刷短视频不一样——这里一屏只放一个概念，你看得见它的难度、常见度，也看得见自己学到哪了。</p>
       </header>
@@ -127,7 +141,7 @@
   <section class="scene" id="scene" aria-labelledby="sceneTitle">
     <div class="wrap scene__grid">
       <div class="scene__aside">
-        <p class="overline">现场题</p>
+        <p class="overline overline--swatch" style="--sec: var(--blue)">现场题</p>
         <h2 id="sceneTitle">一个问题的五种装法</h2>
       </div>
       <ol class="steps">
@@ -145,7 +159,7 @@
     <div class="wrap">
       <article class="feature reveal">
         <div class="feature__copy">
-          <p class="overline">现场题</p>
+          <p class="overline overline--swatch" style="--sec: var(--blue)">现场题</p>
           <h3>别人抛出一个话题，你知道怎么接</h3>
           <ul class="ticks">
             <li><svg class="icon tick__icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 13l4 4 10-10"/></svg>不判对错的三种装法</li>
@@ -160,7 +174,7 @@
 
       <article class="feature feature--reverse reveal" id="handbook">
         <div class="feature__copy">
-          <p class="overline">手册 · 台词本</p>
+          <p class="overline overline--swatch" style="--sec: var(--pink)">手册 · 台词本</p>
           <h3>把好用的说法，收进自己的本子</h3>
           <ul class="ticks">
             <li><svg class="icon tick__icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 13l4 4 10-10"/></svg>现场题一键存进台词本</li>
@@ -175,7 +189,7 @@
 
       <article class="feature reveal">
         <div class="feature__copy">
-          <p class="overline">文艺助手</p>
+          <p class="overline overline--swatch" style="--sec: var(--purple)">文艺助手</p>
           <h3>卡住的时候，先问一句</h3>
           <ul class="ticks">
             <li><svg class="icon tick__icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 13l4 4 10-10"/></svg>随时解答文艺疑问</li>
@@ -208,17 +222,15 @@
     <div class="wrap download__grid">
       <div class="download__copy reveal">
         <h2 id="downloadTitle">下载文艺指南</h2>
-        <p class="download__lead">安卓版直接下载安装。iPhone 与 iPad 版正在开发中，完成后会在本页公布。</p>
+        <p class="download__lead">支持 Android 与 iOS。</p>
+        <div class="dl-actions">
         <a class="btn btn--primary btn--xl magnetic" href="https://mhbwtjtchwrasnckoidt.supabase.co/storage/v1/object/public/app-updates/app-debug.apk">
           <svg class="icon btn__icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4v10"/><path d="m7.5 9.5 4.5 4.5 4.5-4.5"/><path d="M5 19h14"/></svg>
           下载安卓版 APK
         </a>
-        <p class="download__version">版本 1.0.102 · 约 48MB · 更新于 2026-09-10</p>
-        <p class="download__note">目前通过官网直接分发，暂不上架应用商店。</p>
-        <div class="platforms">
-          <span class="platform platform--ready">Android 7.0+ 可下载</span>
-          <span class="platform">iOS 开发中</span>
+        <span class="dl-pending">iOS 即将上架 App Store</span>
         </div>
+        <p class="download__version">版本 1.0.102 · 47.8 MB · 2026-09-10</p>
       </div>
       <div class="download__qr reveal" style="--d:.1s">
         <div class="qr-card"><img loading="lazy" decoding="async" width="720" height="720" src="assets/qr-download.png" alt="文艺指南官网二维码"></div>
@@ -227,9 +239,9 @@
     </div>
     <div class="wrap">
       <ol class="install__steps">
-        <li class="install__step reveal"><span class="install__no">01</span><p>点上面的按钮，下载 APK 文件</p></li>
-        <li class="install__step reveal" style="--d:.08s"><span class="install__no">02</span><p>系统提示时，允许「安装未知应用」</p></li>
-        <li class="install__step reveal" style="--d:.16s"><span class="install__no">03</span><p>安装完成，打开就能用</p></li>
+        <li class="install__step reveal"><span class="install__no">01</span><p>下载 APK</p></li>
+        <li class="install__step reveal" style="--d:.08s"><span class="install__no">02</span><p>允许「安装未知应用」</p></li>
+        <li class="install__step reveal" style="--d:.16s"><span class="install__no">03</span><p>打开就能用</p></li>
       </ol>
     </div>
   </section>
@@ -244,7 +256,7 @@
         <details class="faq__item reveal" style="--d:.1s"><summary>会收集我的数据吗？</summary><p>学习进度、台词本和偏好都保存在你手机本地；只有评论、内容更新这类功能需要联网。</p></details>
         <details class="faq__item reveal" style="--d:.15s"><summary>怎么更新到新版本？</summary><p>App 里可以检查更新，也可以回这个页面重新下载。内容更新走云端，不用重新安装。</p></details>
         <details class="faq__item reveal" style="--d:.2s"><summary>不用应用商店安全吗？</summary><p>安装包由我们的官网直接提供。如果对来源有疑虑，可以先在备用机上试装。</p></details>
-        <details class="faq__item reveal" style="--d:.25s"><summary>有 iOS 版吗？</summary><p>iPhone 与 iPad 版正在开发中，目前只有安卓版可以安装。上线后会在这个页面公布。</p></details>
+        <details class="faq__item reveal" style="--d:.25s"><summary>有 iOS 版吗？</summary><p>有。iOS 版已经完成，正在上架 App Store。开放下载后会在本页公布。</p></details>
       </div>
     </div>
   </section>
@@ -275,7 +287,8 @@
     <h3 class="course-name" id="courseName">本真性</h3>
     <p class="course-def" id="courseDef"></p>
     <p class="course-meta" id="courseMeta"></p>
-    <p class="course-prompt">点卡进入 1 分钟概念微课 <span aria-hidden="true">→</span></p>
+    <p class="course-hint">这是这一节的开头。完整微课里的讲解、判断题和易混辨析，都在 App 里。</p>
+    <a class="btn btn--primary course-cta" id="courseCta" href="#download">去 App 里看</a>
   </div>
 </div>
 

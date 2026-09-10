@@ -42,9 +42,54 @@
       }
       line.appendChild(frag);
     });
-    requestAnimationFrame(() => title.classList.add("is-in"));
   }
   splitHero();
+
+  /* ============================================================
+     开屏页：一张会自己撕开的纸
+     - 只在本会话第一次进站时出现；点任意处 / 滚动 / 按键 / 1.8s 后自动进入
+     - 关闭后才启动 Hero 的逐字入场，避免动画在幕布后面空放
+     - prefers-reduced-motion 或已看过 → 直接跳过
+     ============================================================ */
+  const intro = $("#intro");
+  let introDone = false;
+  let heroStarted = false;
+
+  function startHero() {
+    if (heroStarted) return;
+    heroStarted = true;
+    const title = $("#heroTitle");
+    if (title) requestAnimationFrame(() => title.classList.add("is-in"));
+  }
+
+  function finishIntro() {
+    if (introDone) return;
+    introDone = true;
+    if (intro) {
+      intro.classList.add("is-leaving");
+      window.setTimeout(() => { intro.style.display = "none"; }, 760);
+    }
+    document.body.classList.remove("intro-open");
+    startHero();
+  }
+
+  (function runIntro() {
+    let seen = true;
+    try { seen = sessionStorage.getItem("artify-intro") === "1"; } catch (_) { /* 隐私模式下当作已看过 */ }
+    if (!intro || seen || reduce.matches) {
+      if (intro) intro.style.display = "none";
+      startHero();
+      return;
+    }
+    intro.setAttribute("aria-hidden", "false");
+    document.body.classList.add("intro-open");
+    requestAnimationFrame(() => intro.classList.add("is-in"));
+    const timer = window.setTimeout(finishIntro, 1800);
+    ["click", "keydown", "wheel", "touchstart"].forEach((ev) =>
+      window.addEventListener(ev, () => { window.clearTimeout(timer); finishIntro(); }, { once: true, passive: true })
+    );
+    try { sessionStorage.setItem("artify-intro", "1"); } catch (_) {}
+  })();
 
   /* ============================================================
      导航：汉堡抽屉 + 滚动进度条 + Hero 视差
@@ -193,7 +238,7 @@
         '<h3 class="card__name">' + c.name + "</h3>" +
         '<p class="card__def">' + c.def + "</p>" +
         '<div class="card__meta">理解难度 ' + c.difficulty + " · 常见度 " + c.common + "</div>" +
-        '<div class="card__prompt">点卡进入 1 分钟概念微课 <span aria-hidden="true">→</span></div>';
+        '<div class="card__prompt">点卡看这一条 <span aria-hidden="true">→</span></div>';
       deck.appendChild(el);
       cardsEl.push(el);
       el.addEventListener("pointerdown", onPointerDown);
@@ -514,6 +559,9 @@
     if (lastFocus && lastFocus.focus) lastFocus.focus();
   }
   if (courseClose) courseClose.addEventListener("click", closeCourse);
+  // 「去 App 里看」：关掉浮层并滚到下载区
+  const courseCta = $("#courseCta");
+  if (courseCta) courseCta.addEventListener("click", () => closeCourse());
   if (overlay) overlay.addEventListener("click", (e) => { if (e.target === overlay) closeCourse(); });
   window.addEventListener("keydown", (e) => { if (e.key === "Escape") closeCourse(); });
 
