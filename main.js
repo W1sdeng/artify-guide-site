@@ -280,6 +280,64 @@
   })();
 
   /* ============================================================
+     识宝：讲解卡支持鼠标/手指从下往上拖开
+     ============================================================ */
+  (function () {
+    const root = $("#shibao");
+    if (!root) return;
+    const sheet = $(".sb__sheet", root);
+    if (!sheet) return;
+    const H = () => sheet.offsetHeight || 1;
+    const setY = (px) => sheet.style.setProperty("--sy", px + "px");
+    let drag = null;
+
+    // shibao.js 的时间轴用类驱动，这里保证两者不打架
+    new MutationObserver(() => {
+      if (!drag) sheet.style.removeProperty("--sy");
+    }).observe(root, { attributes: true, attributeFilter: ["class"] });
+
+    sheet.addEventListener("pointerdown", (e) => {
+      if (reduce.matches) return;
+      drag = {
+        id: e.pointerId,
+        startY: e.clientY,
+        base: root.classList.contains("is-lifted") ? 0 : H(),
+        lastY: e.clientY,
+        t: performance.now(),
+        v: 0,
+      };
+      try { sheet.setPointerCapture(e.pointerId); } catch (_) {}
+      root.classList.add("is-dragging-sheet");
+      setY(drag.base);
+    });
+
+    sheet.addEventListener("pointermove", (e) => {
+      if (!drag || e.pointerId !== drag.id) return;
+      let y = drag.base + (e.clientY - drag.startY);
+      if (y < 0) y *= 0.35;                          // 顶部阻尼
+      if (y > H()) y = H() + (y - H()) * 0.35;       // 底部阻尼
+      setY(y);
+      const now = performance.now();
+      if (now > drag.t) drag.v = ((e.clientY - drag.lastY) / (now - drag.t)) * 1000;
+      drag.lastY = e.clientY;
+      drag.t = now;
+    });
+
+    const end = (e) => {
+      if (!drag || (e && e.pointerId !== drag.id)) return;
+      const y = parseFloat(getComputedStyle(sheet).getPropertyValue("--sy")) || 0;
+      const v = drag.v;
+      drag = null;
+      root.classList.remove("is-dragging-sheet");
+      const open = y < H() * 0.5 || v < -450;        // 松手用速度判定，不只位置
+      root.classList.toggle("is-lifted", open);
+      setY(open ? 0 : H());                          // 平滑收尾到目标
+    };
+    sheet.addEventListener("pointerup", end);
+    sheet.addEventListener("pointercancel", end);
+  })();
+
+  /* ============================================================
      藏宝阁：滚进视口，作品依次落架 + 收藏数滚动
      ============================================================ */
   (function () {

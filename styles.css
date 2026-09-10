@@ -483,7 +483,12 @@ html.js .hero__title .char { display: inline-block; opacity: 0; transform: trans
 }
 /* 抠完图：清晰区上移，给下面的讲解卡腾位置 */
 .shibao.is-lifted .sb__view { top: 26%; box-shadow: 0 14px 34px rgba(0, 0, 0, .42); }
-.sb__scene { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.sb__scene {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  transition: opacity .5s var(--ease-out);
+}
+/* 抠完图：原照片淡出，只剩抠好的画 */
+.shibao.is-cutting .sb__scene { opacity: 0; }
 
 .sb__cutwrap {
   position: absolute;
@@ -493,7 +498,11 @@ html.js .hero__title .char { display: inline-block; opacity: 0; transform: trans
 }
 .sb__cut { width: 100%; height: 100%; display: block; opacity: 0; transition: opacity .55s var(--ease-out); }
 .shibao.is-cutting .sb__cut { opacity: 1; }
-.shibao.is-lifted .sb__cutwrap { transform: scale(1.04); filter: drop-shadow(4px 5px 0 var(--ink)); }
+/* 抠好的画往上浮起来，像从照片里被拿出来 */
+.shibao.is-lifted .sb__cutwrap {
+  transform: translateY(-15%) scale(1.07);
+  filter: drop-shadow(5px 7px 0 var(--ink));
+}
 
 .sb__svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .sb__glow, .sb__ray, .sb__ink, .sb__white {
@@ -562,19 +571,19 @@ html.js .hero__title .char { display: inline-block; opacity: 0; transform: trans
 /* 讲解卡：抠完图后从下滑入，占下半屏，内部可滚 */
 .sb__sheet {
   position: absolute; left: 0; right: 0; bottom: 0;
-  height: 60%;
-  padding: 14px 14px 16px;
+  height: 65%;
+  padding: 11px 12px 12px;
   background: var(--paper);
   border-top: 2px solid var(--ink);
   border-radius: 14px 14px 0 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  transform: translateY(101%);
+  overflow: hidden;              /* 不要滚动条 */
+  transform: translateY(var(--sy, 200%));
   transition: transform .55s var(--ease-spring);
 }
-.shibao.is-lifted .sb__sheet { transform: none; }
-.sb__sheet-head { padding-bottom: 8px; border-bottom: 2px solid var(--paper-2); }
-.sb__sheet-name { font-size: 16px; font-weight: 800; }
+.shibao.is-lifted .sb__sheet { --sy: 0px; }
+.shibao.is-dragging-sheet .sb__sheet { transition: none; }
+.sb__sheet-head { padding-bottom: 6px; border-bottom: 2px solid var(--paper-2); }
+.sb__sheet-name { font-size: 15px; font-weight: 800; }
 .sb__sheet-meta { margin-top: 2px; font-size: 10.5px; color: var(--muted); }
 .sb__sec {
   margin-top: 9px;
@@ -583,8 +592,8 @@ html.js .hero__title .char { display: inline-block; opacity: 0; transform: trans
   transition-delay: var(--d, 0ms);
 }
 .shibao.is-lifted .sb__sec { opacity: 1; transform: none; }
-.sb__sec-t { font-size: 10px; font-weight: 800; letter-spacing: .06em; color: var(--purple); }
-.sb__sec-b { margin-top: 2px; font-size: 11px; line-height: 1.6; color: var(--ink-2); }
+.sb__sec-t { font-size: 9.5px; font-weight: 800; letter-spacing: .06em; color: var(--purple); }
+.sb__sec-b { margin-top: 1px; font-size: 10.5px; line-height: 1.5; color: var(--ink-2); }
 .sb__tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px; }
 .sb__tags span {
   padding: 2px 7px;
@@ -592,79 +601,85 @@ html.js .hero__title .char { display: inline-block; opacity: 0; transform: trans
   border: 2px solid var(--ink); border-radius: var(--radius-tag);
   font-size: 10px; font-weight: 700;
 }
-.shibao__replay { margin-top: 14px; }
+/* 重放：手机框左上角的小圆钮，不再是通栏大按钮 */
+.shibao__replay {
+  position: absolute; top: 10px; left: 10px; z-index: 6;
+  width: 28px; height: 28px; min-height: 0; padding: 0;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: var(--paper);
+  box-shadow: var(--shadow-xs);
+}
+.shibao__replay .icon { width: 15px; height: 15px; }
 
 @media (prefers-reduced-motion: reduce) {
   .sb__scanline { animation: none; }
 }
 
-/* ---- 藏宝阁：手机比例的木质书柜（透视，远看一行放三幅） ---- */
+/* ---- 藏宝阁：手机比例 + 纸板书架（本站 UI 语言） ---- */
 .vault { background: var(--paper); padding: clamp(64px,9vw,120px) 0; }
 .case { position: relative; }
 .case__room {
   position: relative;
   aspect-ratio: 1080 / 2400;
   display: flex; flex-direction: column;
-  background: linear-gradient(180deg, var(--paper) 0%, var(--paper-2) 100%);
+  background: linear-gradient(180deg, var(--canvas) 0%, var(--canvas-deep) 100%);
   overflow: hidden;
 }
 .case__bar {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 14px;
-  border-bottom: 2px solid var(--ink);
+  margin: 12px 12px 0;
+  padding: 9px 12px;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-xs);
   font-size: 12px; font-weight: 700;
 }
 .case__count { color: var(--ink-2); }
-.case__count b { font-family: var(--font-num); font-weight: 900; font-size: 14px; color: var(--ink); }
+.case__count b { font-family: var(--font-num); font-weight: 900; font-size: 15px; color: var(--ink); }
 
-/* 透视：像站在书柜前两米远 */
-.case__stage { flex: 1; display: grid; place-items: center; perspective: 900px; padding: 4% 5%; }
-.case__cab {
-  width: 100%;
-  align-self: center;
-  padding: 10px 10px 0;
-  background: url("assets/wood.webp") center / cover;
-  border: 3px solid #452b14;
-  border-radius: 4px;
-  box-shadow: inset 0 0 46px rgba(0, 0, 0, .5), 0 12px 26px rgba(0, 0, 0, .32);
-  transform: rotateX(11deg);
-  transform-style: preserve-3d;
+/* 书架：纸面柜体 + 墨色搁板，尽量占满手机屏 */
+.case__shelf {
+  flex: 1;
+  display: flex; flex-direction: column; justify-content: center;
+  margin: 12px;
+  padding: 14px 14px 16px;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow);
 }
-.case__row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; align-items: end; }
+.case__row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; align-items: end; }
 .case__row--empty { align-items: stretch; }
 
 .piece { margin: 0; opacity: 0; transform: translateY(-14px) scale(.96); }
 .piece img {
   display: block; width: 100%; height: auto;
   background: var(--paper);
-  border: 2px solid #2a1a0c;
-  border-radius: 3px;
-  box-shadow: 0 3px 0 rgba(0, 0, 0, .38);
+  border: 2px solid var(--ink);
+  border-radius: 5px;
+  box-shadow: var(--shadow-xs);
   transition: transform .42s var(--ease-spring);
 }
-.piece:hover img { transform: translateY(-4px) rotate(-.8deg); }
+.piece:hover img { transform: translateY(-5px) rotate(-.8deg); }
 .piece figcaption {
-  margin-top: 3px; text-align: center;
-  font-size: 8px; letter-spacing: .02em;
-  color: rgba(255, 255, 255, .82);
+  margin-top: 5px; text-align: center;
+  font-size: 9px; color: var(--muted);
 }
 
 .case__board {
-  height: 11px;
-  margin: 6px -10px 11px;
-  background: url("assets/wood.webp") center / cover;
-  border-top: 2px solid rgba(255, 255, 255, .28);
-  border-bottom: 3px solid #33200f;
-  box-shadow: 0 5px 10px rgba(0, 0, 0, .45);
+  height: 9px;
+  margin: 7px -6px 12px;
+  background: var(--ink);
+  border-radius: 3px;
 }
 .slot {
   display: block;
   aspect-ratio: 4 / 5;
-  border: 1px dashed rgba(255, 255, 255, .32);
-  border-radius: 3px;
+  border: 2px dashed rgba(37, 37, 39, .3);
+  border-radius: 5px;
 }
-
-/* 落架：从上方落下，弹性收住 */
 .case.is-in .piece {
   opacity: 1; transform: none;
   transition: opacity .4s var(--ease-out) calc(var(--i, 0) * 160ms),
@@ -674,7 +689,7 @@ html.js .hero__title .char { display: inline-block; opacity: 0; transform: trans
   padding: 0 16px 16px;
   text-align: center;
   font-size: 10.5px; line-height: 1.5;
-  color: var(--muted);
+  color: var(--ink-2);
 }
 
 /* ---- 关键词跑马灯 ---- */

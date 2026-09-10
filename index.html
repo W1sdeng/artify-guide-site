@@ -259,7 +259,9 @@
                 </div></div>
             </div>
           </div>
-          <button class="btn btn--ghost shibao__replay" id="shibaoReplay" type="button">重放</button>
+          <button class="btn btn--ghost shibao__replay" id="shibaoReplay" type="button" aria-label="重放">
+            <svg class="icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v4h-4"/></svg>
+          </button>
       </article>
 
       <article class="feature reveal" id="handbook">
@@ -329,28 +331,26 @@
             <span class="case__title">藏宝阁</span>
             <span class="case__count">已收藏 <b id="vaultCount">0</b></span>
           </div>
-          <div class="case__stage">
-            <div class="case__cab">
-              <div class="case__row">
-                <figure class="piece" style="--i:0">
-                  <img src="assets/shibao-cut.webp" width="760" height="950" loading="lazy" decoding="async" alt="《睡莲》，莫奈，1899">
-                  <figcaption>睡莲 · 1899</figcaption>
-                </figure>
-                <figure class="piece" style="--i:1">
-                  <img src="assets/vault-2.webp" width="760" height="950" loading="lazy" decoding="async" alt="《睡莲》，莫奈，1915">
-                  <figcaption>睡莲 · 1915</figcaption>
-                </figure>
-                <figure class="piece" style="--i:2">
-                  <img src="assets/vault-3.webp" width="760" height="950" loading="lazy" decoding="async" alt="《维特伊》，莫奈，1880">
-                  <figcaption>维特伊 · 1880</figcaption>
-                </figure>
-              </div>
-              <div class="case__board" aria-hidden="true"></div>
-              <div class="case__row case__row--empty" aria-hidden="true">
-                <span class="slot"></span><span class="slot"></span><span class="slot"></span>
-              </div>
-              <div class="case__board" aria-hidden="true"></div>
+          <div class="case__shelf">
+            <div class="case__row">
+              <figure class="piece" style="--i:0">
+                <img src="assets/shibao-cut.webp" width="760" height="950" loading="lazy" decoding="async" alt="《睡莲》，莫奈，1899">
+                <figcaption>睡莲 · 1899</figcaption>
+              </figure>
+              <figure class="piece" style="--i:1">
+                <img src="assets/vault-2.webp" width="760" height="950" loading="lazy" decoding="async" alt="《睡莲》，莫奈，1915">
+                <figcaption>睡莲 · 1915</figcaption>
+              </figure>
+              <figure class="piece" style="--i:2">
+                <img src="assets/vault-3.webp" width="760" height="950" loading="lazy" decoding="async" alt="《维特伊》，莫奈，1880">
+                <figcaption>维特伊 · 1880</figcaption>
+              </figure>
             </div>
+            <div class="case__board" aria-hidden="true"></div>
+            <div class="case__row case__row--empty" aria-hidden="true">
+              <span class="slot"></span><span class="slot"></span><span class="slot"></span>
+            </div>
+            <div class="case__board" aria-hidden="true"></div>
           </div>
           <p class="case__hint">架子还没满。去展馆拍一件，识宝会把它放上来。</p>
         </div>
