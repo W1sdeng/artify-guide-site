@@ -318,17 +318,40 @@
     const ai = $("#ai");
     if (!ai) return;
     const STEPS = [[0, "is-step1"], [560, "is-step2"], [2200, "is-step3"], [2820, "is-step4"]];
+    const typed = $$('.ai__row--bot .ai__bubble', ai).filter((el) => !el.classList.contains("ai__typing"));
+    const originals = typed.map((el) => el.textContent);
     let timers = [];
+    let typeTimers = [];
+    // 逐字打出回答
+    function typeAt(idx, speed) {
+      const el = typed[idx];
+      if (!el) return;
+      el.textContent = "";
+      let k = 0;
+      typeTimers[idx] = window.setInterval(() => {
+        k += 1;
+        el.textContent = originals[idx].slice(0, k);
+        if (k >= originals[idx].length) { clearInterval(typeTimers[idx]); typeTimers[idx] = null; }
+      }, speed);
+    }
     function play() {
       timers.forEach(clearTimeout);
       timers = [];
+      typeTimers.forEach((t) => t && clearInterval(t));
+      typeTimers = [];
       ai.classList.remove("is-step1", "is-step2", "is-step3", "is-step4");
+      typed.forEach((el) => { el.textContent = ""; });
       if (reduce.matches) {
         ai.classList.add("is-step1", "is-step2", "is-step3", "is-step4");
+        typed.forEach((el, i) => { el.textContent = originals[i]; });
         return;
       }
       void ai.offsetWidth;
-      STEPS.forEach(([t, c]) => timers.push(window.setTimeout(() => ai.classList.add(c), t)));
+      STEPS.forEach(([t, c]) => timers.push(window.setTimeout(() => {
+        ai.classList.add(c);
+        if (c === "is-step3") typeAt(0, 24);
+        if (c === "is-step4") typeAt(1, 22);
+      }, t)));
     }
     if ("IntersectionObserver" in window) {
       let visible = false;
