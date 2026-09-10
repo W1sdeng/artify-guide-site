@@ -6,19 +6,8 @@
    颜色一律取现有 CSS 变量，缓动取 --ease-spring / --ease-out。
    ============================================================ */
 
-/* ------------------------------------------------------------
-   1. 按钮手绘歪边
-   非对称圆角制造「手撕纸边」感；hover 轻微抬起。
-   .shibao__replay 是圆形重放钮，必须排除，否则圆会变成歪边。
-   :not(:active) 保证按下时仍走 styles.css 的 :active 反馈。
-   ------------------------------------------------------------ */
-.btn:not(.shibao__replay) {
-  border-radius: 2px 255px 3px 255px / 255px 3px 225px 5px;
-}
-.btn:not(:active):hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow);
-}
+/* 按钮不做手绘歪边：必须保留 App 的 2.5D ink 底座样式（见 styles.css .btn），
+   所以这里不覆盖 .btn。 */
 
 /* ------------------------------------------------------------
    2. 章节标题下方手绘下划线
@@ -29,12 +18,15 @@
    clip-path 实现「抽屉式画出」；若必须用 stroke-dashoffset，
    需在 HTML 里放真实内联 <svg>（与「不改 index.html」冲突）。
    ------------------------------------------------------------ */
+main section h2 { position: relative; }
 main section h2::after {
   content: "";
   display: block;
+  position: absolute;
+  left: 0;
+  bottom: -10px;
   width: min(230px, 54%);
   height: 12px;
-  margin-top: 10px;
   background: var(--lime);
   -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 12' preserveAspectRatio='none'%3E%3Cpath d='M2 8C40 2 78 3 112 6s72 6 126-2' fill='none' stroke='%23000' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E");
   -webkit-mask-repeat: no-repeat;
@@ -190,10 +182,6 @@ html.js .reveal.fx-rise.fx-in {
    降低动效偏好：每个效果都给一个静态或直达终态的降级
    ============================================================ */
 @media (prefers-reduced-motion: reduce) {
-  /* 1 按钮：不做抬起位移 */
-  .btn:not(:active):hover {
-    transform: none;
-  }
   /* 2 下划线：直接完整显示 */
   html.js main section h2::after {
     clip-path: inset(0 0 0 0);

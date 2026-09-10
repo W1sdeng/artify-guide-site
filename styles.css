@@ -114,21 +114,25 @@ h3 { font-size: var(--fs-h3); line-height: 1.3; font-weight: 700; }
   min-height: 48px;
   padding: 0 22px;
   border: 2px solid var(--ink);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-card);
   background: var(--paper);
   color: var(--ink);
   font-weight: 700;
   text-decoration: none;
-  box-shadow: var(--shadow-sm);
+  /* App 2.5D：按钮正下方一块同宽的 ink 实心底座（0 横向偏移、同圆角），不是斜投影 */
+  box-shadow: 0 4px 0 rgba(37, 37, 39, .45);
   transition: transform var(--dur-press) var(--ease-out), box-shadow var(--dur-press) var(--ease-out), background var(--dur-press) var(--ease-out);
   will-change: transform;
 }
-.btn--primary { background: var(--lime); }
+.btn--primary { background: var(--lime); box-shadow: 0 5px 0 var(--ink); }
 .btn--ghost { background: var(--paper); }
 .btn--lg { min-height: 54px; padding: 0 28px; font-size: 17px; }
 .btn--xl { min-height: 62px; padding: 0 36px; font-size: 19px; border-radius: var(--radius-card); }
-.btn:hover { transform: translate(1px, 1px); box-shadow: var(--shadow-xs); }
-.btn:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--ink); }
+/* hover 抬起、底座随之加高；按下沉到贴近底座（对齐 App 的 translateY(3dp)+底座 1dp） */
+.btn:hover { transform: translateY(-1px); box-shadow: 0 5px 0 rgba(37, 37, 39, .45); }
+.btn--primary:hover { box-shadow: 0 6px 0 var(--ink); }
+.btn:active { transform: translateY(4px); box-shadow: 0 1px 0 rgba(37, 37, 39, .45); }
+.btn--primary:active { box-shadow: 0 1px 0 var(--ink); }
 .btn__icon { width: 22px; height: 22px; }
 
 /* ---- 滚动进度条（青柠细线） ---- */
@@ -721,8 +725,8 @@ html.js .hero__title.is-in .hero__line-in {
 }
 
 /* ---- clip-path 揭示（trevornoah）：按钮从右往左刷出，导航项逐个刷出 ---- */
-html.js .btn--reveal { clip-path: inset(0 100% 0 0 round 999px); transition: clip-path .72s var(--ease-out); }
-html.js .btn--reveal.is-in { clip-path: inset(0 0 0 0 round 999px); }
+html.js .btn--reveal { clip-path: inset(0 100% 0 0 round 16px); transition: clip-path .72s var(--ease-out); }
+html.js .btn--reveal.is-in { clip-path: inset(0 0 0 0 round 16px); }
 html.js .nav__links a { clip-path: inset(0 100% 0 0); transition: clip-path .55s var(--ease-out); }
 html.js .nav.is-ready .nav__links a { clip-path: inset(0 0 0 0); }
 html.js .nav.is-ready .nav__links a:nth-child(2) { transition-delay: .07s; }
@@ -773,9 +777,10 @@ html.js .nav.is-ready .nav__links a:nth-child(7) { transition-delay: .42s; }
 
 /* ---- 藏宝阁：手机比例 + 纸板书架（本站 UI 语言） ---- */
 .case { position: relative; }
+/* 藏宝阁是识宝旁边的一屏手机界面，与识宝手机同比例 */
 .case__room {
   position: relative;
-  aspect-ratio: 1080 / 1620;
+  aspect-ratio: 1080 / 2400;
   display: flex; flex-direction: column;
   background: linear-gradient(180deg, var(--canvas) 0%, var(--canvas-deep) 100%);
   overflow: hidden;
@@ -852,6 +857,9 @@ html.js .nav.is-ready .nav__links a:nth-child(7) { transition-delay: .42s; }
   font-size: 10.5px; line-height: 1.5;
   color: var(--ink-2);
 }
+/* 藏宝阁说明：并入识宝页后补回这段描述 */
+.shelf-col { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.shelf-desc { max-width: 32ch; text-align: center; font-size: 13px; line-height: 1.75; color: var(--ink-2); }
 
 /* ---- 关键词跑马灯 ---- */
 .marquee { overflow: hidden; background: var(--paper-2); border-block: 2px solid var(--ink); }
@@ -868,7 +876,7 @@ html.js .nav.is-ready .nav__links a:nth-child(7) { transition-delay: .42s; }
 .download__grid { display: grid; gap: 40px; align-items: center; }
 .download__copy h2 { margin-bottom: 28px; }
 .download__version { margin-top: 18px; font-family: var(--font-num); font-size: 14px; letter-spacing: .04em; color: var(--ink-2); }
-.download__lead { margin-bottom: 26px; max-width: 34ch; font-size: 17px; color: var(--ink); }
+.download__lead { margin-top: 16px; margin-bottom: 26px; max-width: 34ch; font-size: 17px; color: var(--ink); }
 .download__copy h2 { margin-bottom: 0; }
 .download__note { margin-top: 10px; color: var(--ink-2); }
 
