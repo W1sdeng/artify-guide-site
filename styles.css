@@ -54,7 +54,7 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
-body.no-scroll { overflow: hidden; }
+html.no-scroll, body.no-scroll { overflow: hidden; }
 
 img { max-width: 100%; display: block; }
 a { color: inherit; }
@@ -229,7 +229,9 @@ html.js .hero__title .char { display: inline-block; opacity: 0; transform: trans
 .theater { background: var(--paper); padding: clamp(64px,9vw,120px) 0; }
 .section-head { margin-bottom: clamp(40px,6vw,64px); }
 
-.deck-stage { position: relative; min-height: clamp(500px,78vw,560px); display: grid; place-items: center; margin-inline: auto; width: min(100%, 640px); touch-action: pan-y; }
+/* isolation: isolate 把卡片的 z-index 关在这一层里，
+   否则卡片会盖住吸顶导航和微课浮层（曾经的两个线上 bug） */
+.deck-stage { position: relative; isolation: isolate; min-height: clamp(500px,78vw,560px); display: grid; place-items: center; margin-inline: auto; width: min(100%, 640px); touch-action: pan-y; }
 .deck { position: absolute; inset: 0; }
 .card {
   width: clamp(280px,84vw,340px);
@@ -432,10 +434,14 @@ html.js .hero__title .char { display: inline-block; opacity: 0; transform: trans
 
 /* ---- 进微课庆祝层（自由区） ---- */
 .course-overlay {
-  position: fixed; inset: 0; z-index: 80;
-  display: grid; place-items: center;
+  position: fixed; inset: 0;
+  /* 必须高于吸顶导航(50)、进度条(60)与概念卡(卡片内部 z-index 100，已由 isolate 限制在 deck 内) */
+  z-index: 200;
+  display: flex; align-items: center; justify-content: center;
   padding: 24px;
   background: rgba(137,153,220,.28);
+  overflow-y: auto;                 /* 面板比屏幕高时可以滚动 */
+  overscroll-behavior: contain;     /* 不要带着后面的页面一起滚 */
   visibility: hidden; opacity: 0; pointer-events: none;
   transition: opacity var(--dur-enter) var(--ease-out), visibility 0s linear var(--dur-enter);
 }
@@ -455,6 +461,7 @@ html.js .hero__title .char { display: inline-block; opacity: 0; transform: trans
 }
 .course-panel {
   position: relative; z-index: 1;
+  margin: auto;                     /* 与 flex 居中配合：短则居中，长则从顶部可滚 */
   width: min(100%, 460px);
   padding: 32px;
   background: var(--paper);
@@ -528,6 +535,11 @@ html:not(.js) .step { opacity: 1; }
 
 @media (min-width: 1440px) {
   :root { --wrap: 1240px; }
+}
+
+/* 单列布局下标题列不再吸顶，否则会压在下面五张步骤卡上 */
+@media (max-width: 767px) {
+  .scene__aside { position: static; }
 }
 
 @media (max-width: 559px) {

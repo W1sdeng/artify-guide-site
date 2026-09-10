@@ -222,8 +222,9 @@
       const off = i - current;
       let x = 0, y = 0, r = 0, s = 0.85, o = 0, z = 100 - off;
       if (off === 0) { x = frontX; y = frontY; r = frontR; s = frontS; o = 1; }
-      else if (off === 1) { x = 14; y = 16; r = 3; s = 0.95; o = 1; }
-      else if (off === 2) { x = 28; y = 32; r = 6; s = 0.9; o = 1; }
+      // 位移收敛：卡片缩小后右边缘不得越过卡组，否则在窄屏上会溢出到版心外
+      else if (off === 1) { x = 8; y = 16; r = 2; s = 0.95; o = 1; }
+      else if (off === 2) { x = 16; y = 32; r = 4; s = 0.9; o = 1; }
       el.style.setProperty("--x", num(x) + "px");
       el.style.setProperty("--y", num(y) + "px");
       el.style.setProperty("--r", num(r) + "deg");
@@ -496,6 +497,8 @@
     if (courseDef) courseDef.textContent = c.def;
     if (courseMeta) courseMeta.textContent = "理解难度 " + c.difficulty + " · 常见度 " + c.common;
     overlay.setAttribute("aria-hidden", "false");
+    // html 与 body 都要锁，只锁 body 时移动端仍能滚动背景
+    document.documentElement.classList.add("no-scroll");
     document.body.classList.add("no-scroll");
     // 先显示，再触发青柠色块的庆祝动画与面板弹性入场
     requestAnimationFrame(() => overlay.classList.add("is-open"));
@@ -506,6 +509,7 @@
     if (!overlay || !overlay.classList.contains("is-open")) return;
     overlay.classList.remove("is-open");
     overlay.setAttribute("aria-hidden", "true");
+    document.documentElement.classList.remove("no-scroll");
     document.body.classList.remove("no-scroll");
     if (lastFocus && lastFocus.focus) lastFocus.focus();
   }
