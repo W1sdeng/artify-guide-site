@@ -341,17 +341,17 @@ html.js .hero__title.is-in .hero__line-in {
 }
 .deck--enhanced.is-dragging .card { cursor: grabbing; }
 
-/* 发牌入场：滚进视口时五张卡按 --i 错峰落位 */
+/* 发牌入场：五张卡从右侧滑入、逐张叠到前一张上（重叠效果） */
 .deck-stage.is-dealing .card {
-  animation: card-deal .7s var(--ease-spring) backwards;
-  animation-delay: calc(var(--i, 0) * 90ms);
+  animation: card-deal .72s var(--ease-spring) backwards;
+  animation-delay: calc(var(--i, 0) * 110ms);
 }
 @keyframes card-deal {
   from {
     opacity: 0;
     transform: translate(-50%, -50%)
-               translate(var(--x, 0px), calc(var(--y, 0px) + 76px))
-               rotate(var(--r, 0deg)) scale(calc(var(--s, 1) * .9));
+               translate(calc(var(--x, 0px) + 170px), var(--y, 0px))
+               rotate(calc(var(--r, 0deg) + 8deg)) scale(calc(var(--s, 1) * .94));
   }
 }
 .card.is-dragging { cursor: grabbing; box-shadow: 9px 12px 0 var(--ink); }
