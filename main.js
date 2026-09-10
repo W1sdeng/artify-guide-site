@@ -43,6 +43,39 @@
   splitHero();
 
   /* ============================================================
+     章节标题逐字揭示：把 main 里的 h2 切成逐字 span，进视口错峰上浮
+     ============================================================ */
+  (function () {
+    const heads = $$("main section h2");
+    if (!heads.length) return;
+    heads.forEach((h) => {
+      const text = h.textContent.trim();
+      if (!text) return;
+      h.textContent = "";
+      Array.prototype.forEach.call(text, (ch, i) => {
+        const w = document.createElement("span");
+        w.className = "word";
+        const inner = document.createElement("span");
+        inner.className = "word__in";
+        inner.textContent = ch === " " ? "\u00A0" : ch;
+        w.style.setProperty("--wi", i);
+        w.appendChild(inner);
+        h.appendChild(w);
+      });
+    });
+    if (reduce.matches || !("IntersectionObserver" in window)) {
+      heads.forEach((h) => h.classList.add("is-splitin"));
+      return;
+    }
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((en) => {
+        if (en.isIntersecting) { en.target.classList.add("is-splitin"); io.unobserve(en.target); }
+      });
+    }, { threshold: 0.3 });
+    heads.forEach((h) => io.observe(h));
+  })();
+
+  /* ============================================================
      开屏页：一张会自己撕开的纸
      - 只在本会话第一次进站时出现；点任意处 / 滚动 / 按键 / 1.8s 后自动进入
      - 关闭后才启动 Hero 的逐字入场，避免动画在幕布后面空放
