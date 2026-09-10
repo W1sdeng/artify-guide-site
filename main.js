@@ -890,6 +890,15 @@
   if (courseCta) courseCta.addEventListener("click", () => closeCourse());
   if (overlay) overlay.addEventListener("click", (e) => { if (e.target === overlay) closeCourse(); });
   window.addEventListener("keydown", (e) => { if (e.key === "Escape") closeCourse(); });
+  // 焦点陷阱：微课浮层打开时，Tab 只在浮层内循环，不跑到背景
+  window.addEventListener("keydown", (e) => {
+    if (!overlay || !overlay.classList.contains("is-open") || e.key !== "Tab") return;
+    const items = overlay.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])');
+    if (!items.length) return;
+    const first = items[0], last = items[items.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
 
   /* ============================================================
      磁吸主 CTA（仅桌面精细指针）
