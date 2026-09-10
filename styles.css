@@ -1106,6 +1106,28 @@ html.js .nav.is-ready .nav__links a:nth-child(7) { transition-delay: .42s; }
 .deck-preview__hint { display: block; margin-top: 7px; font-size: 10px; font-weight: 700; color: var(--ink-2); }
 @media (pointer: coarse) { .deck-preview { display: none; } }
 
+/* ---- 成就吐司：纸卡 + 青柠印戳 + 钩号描出 ---- */
+.toast {
+  position: fixed; right: 18px; bottom: 18px; z-index: 150;
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 16px 11px 11px;
+  background: var(--paper);
+  border: 2px solid var(--ink); border-radius: var(--radius-card);
+  box-shadow: var(--shadow);
+  transform: translateY(16px) rotate(-1.5deg);
+  opacity: 0; pointer-events: none;
+  transition: opacity .4s var(--ease-out), transform .5s var(--ease-spring);
+}
+.toast.is-on { opacity: 1; transform: translateY(0) rotate(-1.5deg); pointer-events: auto; cursor: pointer; }
+.toast__seal { width: 34px; height: 34px; flex: none; display: grid; place-items: center; border: 2px solid var(--ink); border-radius: 50%; background: var(--lime); color: var(--ink); }
+.toast__seal svg { width: 19px; height: 19px; }
+.toast__tick { stroke-dasharray: 1; stroke-dashoffset: 1; }
+.toast.is-on .toast__tick { stroke-dashoffset: 0; transition: stroke-dashoffset .34s var(--ease-out) .18s; }
+.toast__body { display: flex; flex-direction: column; line-height: 1.35; }
+.toast__body b { font-size: 13px; }
+.toast__body span { font-size: 12px; color: var(--ink-2); }
+@media (max-width: 559px) { .toast { left: 18px; right: 18px; } }
+
 /* ---- 滚入揭示（错峰） ---- */
 html.js .reveal {
   opacity: 0; transform: translateY(26px);

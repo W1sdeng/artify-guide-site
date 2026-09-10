@@ -1111,4 +1111,35 @@
       requestAnimationFrame(loop);
     })();
   })();
+
+  /* ============================================================
+     成就吐司：识宝首次收进藏宝阁时弹出；本机 localStorage 去重
+     ============================================================ */
+  (function () {
+    const toast = $("#toast");
+    const shelf = $("#shelf");
+    if (!toast || !shelf) return;
+    const KEY = "artify-toast-vault";
+    let seen = false;
+    try { seen = localStorage.getItem(KEY) === "1"; } catch (_) {}
+    let hideTimer = null;
+    function hide() {
+      toast.classList.remove("is-on");
+      toast.setAttribute("aria-hidden", "true");
+      if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
+    }
+    function show() {
+      if (seen) return;
+      seen = true;
+      try { localStorage.setItem(KEY, "1"); } catch (_) {}
+      toast.setAttribute("aria-hidden", "false");
+      requestAnimationFrame(() => toast.classList.add("is-on"));
+      hideTimer = window.setTimeout(hide, 5200);
+    }
+    if ("MutationObserver" in window) {
+      new MutationObserver(() => { if (shelf.classList.contains("is-landed")) show(); })
+        .observe(shelf, { attributes: true, attributeFilter: ["class"] });
+    }
+    toast.addEventListener("click", hide);
+  })();
 })();
