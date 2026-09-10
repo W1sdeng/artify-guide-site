@@ -14,8 +14,10 @@
       screenshot-*.webp 真机截图（今日 / 现场题 / 手册 / 路线）
       artify-wordmark.png 品牌字标
       qr-download.png   下载区二维码（指向本站官网）
+    shibao.js           识宝演示动画（照片→识别→描边→抠图→说明→藏宝阁）
     tools/
       build-assets.py   从 source-screens 生成 WebP / 字标 / 二维码 / favicon
+      build-shibao.py   合成识宝演示素材（展厅照 / 抠图 / 轮廓）
       subset-fonts.py   按页面实际用字生成字体子集
       source-screens/   真机截图原图（1080x2400，安卓模拟器实拍）
 
@@ -37,6 +39,11 @@
 换真机截图：把新图覆盖到 `tools/source-screens/`（today.png / scene.png / handbook.png / route.png），然后
 
     <venv-python> tools/build-assets.py
+
+识宝演示素材（展厅照 / 抠图 / 轮廓路径）由本地公有领域油画合成，换画作只需改脚本里的
+`BACKDROP_DIR` / `KEYWORD` / `PAINT`：
+
+    <venv-python> tools/build-shibao.py
 
 改过页面文案后，字体子集需要重跑，否则新出现的字可能缺字形：
 
