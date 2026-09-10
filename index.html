@@ -16,6 +16,7 @@
 <!-- 开屏页：一张会自己撕开的纸。只在本会话首次进站时出现 -->
 <div class="intro" id="intro" aria-hidden="true">
   <span class="intro__half intro__half--l" aria-hidden="true"></span>
+  <span class="intro__half intro__half--edge" aria-hidden="true"></span>
   <span class="intro__half intro__half--r" aria-hidden="true"></span>
 
   <div class="intro__inner">
@@ -145,20 +146,25 @@
     </div>
   </section>
 
-  <!-- 现场题：sticky 左栏 + 滚动驱动步骤点亮 -->
+  <!-- 现场题：桌面钉住 + 横向推进；移动端 / 减动效退回纵向列表 -->
   <section class="scene" id="scene" aria-labelledby="sceneTitle">
-    <div class="wrap scene__grid">
-      <div class="scene__aside">
-        <p class="overline overline--swatch" style="--sec: var(--blue)">现场题</p>
-        <h2 id="sceneTitle">一个问题的五种装法</h2>
+    <div class="scene__frame">
+      <div class="wrap scene__grid">
+        <div class="scene__aside">
+          <p class="overline overline--swatch" style="--sec: var(--blue)">现场题</p>
+          <h2 id="sceneTitle">一个问题的五种装法</h2>
+          <p class="scene__cue" aria-hidden="true">向下滚动，五步依次推进</p>
+        </div>
+        <div class="scene__viewport">
+          <ol class="steps">
+            <li class="step" data-step><span class="step__no">01</span><div class="step__body"><h3>题干</h3><p>不出现概念名，只给一个具体场合</p></div></li>
+            <li class="step" data-step><span class="step__no">02</span><div class="step__body"><h3>选一种装法</h3><p>三种说法，不判对错</p></div></li>
+            <li class="step" data-step><span class="step__no">03</span><div class="step__body"><h3>回答层</h3><p>核心句 / 阐释 / 出处 / 发光词 / 翻车 / 补救</p></div></li>
+            <li class="step" data-step><span class="step__no">04</span><div class="step__body"><h3>改写一句</h3><p>用你自己的话重说一遍</p></div></li>
+            <li class="step" data-step><span class="step__no">05</span><div class="step__body"><h3>存进台词本</h3><p>连同谱系偏好 +1</p></div></li>
+          </ol>
+        </div>
       </div>
-      <ol class="steps">
-        <li class="step" data-step><span class="step__no">01</span><div class="step__body"><h3>题干</h3><p>不出现概念名，只给一个具体场合</p></div></li>
-        <li class="step" data-step><span class="step__no">02</span><div class="step__body"><h3>选一种装法</h3><p>三种说法，不判对错</p></div></li>
-        <li class="step" data-step><span class="step__no">03</span><div class="step__body"><h3>回答层</h3><p>核心句 / 阐释 / 出处 / 发光词 / 翻车 / 补救</p></div></li>
-        <li class="step" data-step><span class="step__no">04</span><div class="step__body"><h3>改写一句</h3><p>用你自己的话重说一遍</p></div></li>
-        <li class="step" data-step><span class="step__no">05</span><div class="step__body"><h3>存进台词本</h3><p>连同谱系偏好 +1</p></div></li>
-      </ol>
     </div>
   </section>
 
@@ -451,6 +457,9 @@
 </aside>
 
 <span class="cursor-dot" id="cursorDot" aria-hidden="true"></span>
+
+<!-- 概念卡：光标跟随的小卡预览（仅桌面精细指针，减动效时隐藏） -->
+<div class="deck-preview" id="deckPreview" aria-hidden="true"></div>
 
 <script src="shibao.js"></script>
 <script src="main.js"></script>

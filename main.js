@@ -263,18 +263,23 @@
   }
 
   /* ============================================================
-     现场题：滚动驱动步骤点亮（越过中线即永久点亮）
+     现场题
+     - 桌面：钉住 + 横向推进（.scene 撑高成跑道，.scene__frame 吸附，五步横向平移）
+     - 移动端 / 减动效 / 无 IO：退回纵向列表，滚入点亮
      ============================================================ */
+  let scenePinned = false;
+
+  /* 纵向兜底：越过中线即永久点亮 */
   if ("IntersectionObserver" in window) {
     const stepObs = new IntersectionObserver((entries) => {
-      entries.forEach((en) => { if (en.isIntersecting) en.target.classList.add("is-lit"); });
+      entries.forEach((en) => { if (en.isIntersecting && !scenePinned) en.target.classList.add("is-lit"); });
     }, { rootMargin: "-45% 0px -45% 0px" });
     $$("[data-step]").forEach((el) => stepObs.observe(el));
   } else {
     $$("[data-step]").forEach((el) => el.classList.add("is-lit"));
   }
 
-  /* 现场题五步：滚进视口时依次往上滑入（墨水加强仍由上面的 is-lit 驱动） */
+  /* 纵向兜底：五步依次往上滑入 */
   (function () {
     const ol = $(".steps");
     if (!ol || !("IntersectionObserver" in window)) return;
@@ -282,7 +287,7 @@
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((en) => {
-          if (!en.isIntersecting || reduce.matches) return;
+          if (!en.isIntersecting || reduce.matches || scenePinned) return;
           ol.classList.remove("is-dealt");
           void ol.offsetWidth;
           ol.classList.add("is-dealt");
@@ -291,6 +296,99 @@
       { threshold: 0.35 }
     );
     io.observe(ol);
+  })();
+
+  /* 桌面：钉住 + 横向推进。进度映射到轨道平移量，越过锚点的步骤永久点亮 */
+  (function () {
+    const scene = $("#scene");
+    const frame = scene && $(".scene__frame", scene);
+    const viewport = scene && $(".scene__viewport", scene);
+    const stepsEl = scene && $(".steps", scene);
+    if (!scene || !frame || !viewport || !stepsEl) return;
+    const steps = $$(".step", stepsEl);
+    const pinnedMQ = window.matchMedia("(min-width: 768px)");
+
+    let maxT = 0;      // 轨道可平移的最大距离
+    let centers = [];  // 每步中心相对轨道起点的位置
+    let sceneTop = 0;  // 区块绝对顶部
+    let navH = 64;
+    let tx = 0;        // 当前平移量
+    let maxLit = -1;
+    let queued = false;
+    let rQueued = false;
+
+    function measure() {
+      if (!scenePinned) return;
+      centers = steps.map((el) => el.offsetLeft + el.offsetWidth / 2);
+      // 让最后一步也能推进到锚点：跑道长度 = 末步中心到锚点的距离
+      maxT = Math.max(0, centers[centers.length - 1] - viewport.clientWidth * 0.5);
+      sceneTop = scene.getBoundingClientRect().top + window.scrollY;
+      navH = $(".nav") ? $(".nav").offsetHeight : 64;
+      scene.style.height = (frame.offsetHeight + maxT) + "px";
+    }
+
+    function update() {
+      if (!scenePinned) return;
+      const start = sceneTop - navH;
+      const end = start + maxT;
+      const p = clamp((window.scrollY - start) / (end - start || 1), 0, 1);
+      const next = -p * maxT;
+      if (Math.abs(next - tx) > 0.2) {
+        tx = next;
+        stepsEl.style.transform = "translate3d(" + tx + "px,0,0)";
+      }
+      const anchor = viewport.clientWidth * 0.5;
+      let best = 0, bd = Infinity;
+      for (let i = 0; i < centers.length; i++) {
+        const d = Math.abs(centers[i] + tx - anchor);
+        if (d < bd) { bd = d; best = i; }
+      }
+      if (best > maxLit) {
+        maxLit = best;
+        for (let i = 0; i <= maxLit; i++) steps[i].classList.add("is-lit");
+      }
+    }
+
+    function enable() {
+      if (scenePinned) return;
+      scenePinned = true;
+      scene.classList.add("scene--pinned");
+      steps.forEach((el) => el.classList.remove("is-lit"));
+      maxLit = -1; tx = 0;
+      requestAnimationFrame(() => { measure(); update(); });
+    }
+
+    function disable() {
+      if (!scenePinned) return;
+      scenePinned = false;
+      scene.classList.remove("scene--pinned");
+      scene.style.height = "";
+      stepsEl.style.transform = "";
+      tx = 0; maxLit = -1;
+      steps.forEach((el) => el.classList.remove("is-lit"));
+    }
+
+    function sync() {
+      if (pinnedMQ.matches && !reduce.matches) enable();
+      else disable();
+    }
+
+    window.addEventListener("scroll", () => {
+      if (!scenePinned || queued) return;
+      queued = true;
+      requestAnimationFrame(() => { queued = false; update(); });
+    }, { passive: true });
+
+    window.addEventListener("resize", () => {
+      if (!scenePinned || rQueued) return;
+      rQueued = true;
+      requestAnimationFrame(() => { rQueued = false; measure(); update(); });
+    }, { passive: true });
+
+    if (pinnedMQ.addEventListener) pinnedMQ.addEventListener("change", sync);
+    else if (pinnedMQ.addListener) pinnedMQ.addListener(sync);
+
+    sync();
   })();
 
   /* ============================================================
@@ -858,4 +956,47 @@
       requestAnimationFrame(follow);
     })();
   }
+
+  /* ============================================================
+     概念卡：光标跟随的小卡预览（仅桌面精细指针）
+     - 进入卡组淡入、跟随光标带轻微阻尼；拖拽时让位
+     ============================================================ */
+  (function () {
+    const preview = $("#deckPreview");
+    const stage = $(".deck-stage");
+    if (!preview || !stage || !finePointer.matches || reduce.matches) return;
+    let px = 0, py = 0, cx = 0, cy = 0;
+    let active = false, shown = false, lastIdx = -1;
+
+    function fill() {
+      const c = CARDS[current];
+      if (!c) return;
+      preview.innerHTML =
+        '<span class="deck-preview__idx">' + c.idx + "</span>" +
+        '<span class="deck-preview__name">' + c.name + "</span>" +
+        '<span class="deck-preview__hint">进微课 →</span>';
+    }
+
+    stage.addEventListener("pointerenter", (e) => {
+      active = true;
+      cx = px = e.clientX;
+      cy = py = e.clientY;
+    });
+    stage.addEventListener("pointermove", (e) => { px = e.clientX; py = e.clientY; }, { passive: true });
+    stage.addEventListener("pointerleave", () => { active = false; });
+
+    (function loop() {
+      if (current !== lastIdx) { lastIdx = current; fill(); }
+      const dragging = deck && deck.classList.contains("is-dragging");
+      const want = active && !dragging;
+      if (want !== shown) { shown = want; preview.classList.toggle("is-on", want); }
+      if (want) {
+        cx += (px - cx) * 0.22;
+        cy += (py - cy) * 0.22;
+        preview.style.transform =
+          "translate3d(" + (cx + 20) + "px," + (cy + 16) + "px,0) rotate(-6deg)";
+      }
+      requestAnimationFrame(loop);
+    })();
+  })();
 })();

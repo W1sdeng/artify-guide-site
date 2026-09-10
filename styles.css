@@ -341,6 +341,8 @@ html.js .hero__title.is-in .hero__line-in {
 .scene { background: var(--paper); padding: clamp(64px,9vw,120px) 0; border-top: 2px solid var(--ink); }
 .scene__grid { display: grid; gap: 40px; }
 .scene__aside { position: sticky; top: calc(var(--nav-h) + 32px); align-self: start; }
+.scene__cue { display: none; margin-top: 18px; font-size: 13px; letter-spacing: .04em; color: var(--muted); }
+.scene__viewport { min-width: 0; }
 .steps { display: grid; gap: 20px; }
 .step {
   display: flex; gap: 18px; align-items: flex-start;
@@ -360,6 +362,46 @@ html.js .hero__title.is-in .hero__line-in {
 .step__no { font-family: var(--font-num); font-weight: 900; font-size: 22px; line-height: 1; color: var(--ink); }
 .step__body h3 { font-size: 20px; }
 .step__body p { margin-top: 6px; color: var(--ink-2); }
+
+/* 桌面端：钉住 + 横向推进（ScrollTrigger 式）。
+   .scene 由 JS 撑高成滚动跑道，.scene__frame 吸附在视口内，
+   五步在 .scene__viewport 里横向平移；移动端 / 减动效退回上面的纵向列表。 */
+.scene--pinned { padding: 0; }
+.scene--pinned .scene__frame {
+  position: sticky; top: var(--nav-h);
+  height: calc(100vh - var(--nav-h));
+  display: flex; align-items: center;
+  overflow: hidden;
+}
+.scene--pinned .scene__grid {
+  width: min(100% - 40px, var(--wrap));
+  margin-inline: auto;
+  grid-template-columns: 0.86fr 1.14fr;
+  gap: 56px;
+  align-items: center;
+}
+.scene--pinned .scene__aside { position: static; }
+.scene--pinned #sceneTitle { font-size: clamp(30px, 3.4vw, 46px); }
+.scene--pinned .scene__cue { display: block; }
+.scene--pinned .scene__viewport {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, #000 0, #000 84%, transparent 100%);
+  mask-image: linear-gradient(90deg, #000 0, #000 84%, transparent 100%);
+}
+.scene--pinned .steps {
+  display: flex; flex-wrap: nowrap; gap: 24px;
+  width: max-content;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+.scene--pinned .step {
+  flex: 0 0 auto;
+  width: min(380px, 32vw);
+  min-height: 240px;
+  align-items: center;
+}
+.scene--pinned .step__no { font-size: 30px; }
+.scene--pinned .steps.is-dealt .step { animation: none; }
 
 /* ---- 功能交替段 ---- */
 .features { background: var(--paper); padding: clamp(64px,9vw,120px) 0; }
@@ -658,13 +700,23 @@ html.js .nav.is-ready .nav__links a:nth-child(6) { transition-delay: .35s; }
 /* ---- 开屏：纸片从中间撕开（itomdev） ---- */
 .intro__half { position: absolute; inset: 0; background: var(--canvas); z-index: 0; }
 .intro__half--l {
+  z-index: 2;
   clip-path: polygon(0 0, 53% 0, 47% 11%, 54% 23%, 46% 35%, 53% 47%, 47% 59%, 54% 71%, 46% 83%, 52% 100%, 0 100%);
 }
 .intro__half--r {
   clip-path: polygon(53% 0, 100% 0, 100% 100%, 52% 100%, 46% 83%, 54% 71%, 47% 59%, 53% 47%, 46% 35%, 54% 23%, 47% 11%);
 }
-.intro__inner, .intro__hint { position: relative; z-index: 1; }
+/* 撕裂处 1px 墨边：把左半片的锯齿轮廓右移 1px 当作墨线，
+   压在右半片之上、左半片之下，于是只有缝上那 1px 露出来 */
+.intro__half--edge {
+  z-index: 1;
+  background: var(--ink);
+  transform: translateX(1px);
+  clip-path: polygon(0 0, 53% 0, 47% 11%, 54% 23%, 46% 35%, 53% 47%, 47% 59%, 54% 71%, 46% 83%, 52% 100%, 0 100%);
+}
+.intro__inner, .intro__hint { position: relative; z-index: 3; }
 .intro.is-leaving .intro__half--l { transform: translateX(-102%); transition: transform .86s var(--ease-out); }
+.intro.is-leaving .intro__half--edge { transform: translateX(calc(-102% + 1px)); transition: transform .86s var(--ease-out); }
 .intro.is-leaving .intro__half--r { transform: translateX(102%); transition: transform .86s var(--ease-out); }
 .intro.is-leaving .intro__inner, .intro.is-leaving .intro__hint { opacity: 0; transition: opacity .28s var(--ease-out); }
 
@@ -888,6 +940,27 @@ html.js .nav.is-ready .nav__links a:nth-child(6) { transition-delay: .35s; }
   transition: opacity var(--dur-press) var(--ease-out);
 }
 
+/* ---- 概念卡：光标跟随的小卡预览（仅桌面精细指针） ---- */
+.deck-preview {
+  position: fixed; top: 0; left: 0; z-index: 80;
+  width: 116px;
+  padding: 11px 13px;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-xs);
+  pointer-events: none;
+  opacity: 0;
+  transform: translate3d(-300px, -300px, 0) rotate(-6deg);
+  transition: opacity .22s var(--ease-out);
+  will-change: transform, opacity;
+}
+.deck-preview.is-on { opacity: 1; }
+.deck-preview__idx { display: block; font-family: var(--font-num); font-weight: 900; font-size: 12px; letter-spacing: .05em; color: var(--muted); }
+.deck-preview__name { display: block; margin-top: 3px; font-weight: 800; font-size: 15px; line-height: 1.2; }
+.deck-preview__hint { display: block; margin-top: 7px; font-size: 10px; font-weight: 700; color: var(--ink-2); }
+@media (pointer: coarse) { .deck-preview { display: none; } }
+
 /* ---- 滚入揭示（错峰） ---- */
 html.js .reveal {
   opacity: 0; transform: translateY(26px);
@@ -895,8 +968,9 @@ html.js .reveal {
   transition-delay: var(--d, 0s);
 }
 html.js .reveal.is-in { opacity: 1; transform: none; }
-/* 无 JS：揭示层与步骤全部直接可见 */
+/* 无 JS：揭示层与步骤全部直接可见，开屏不再拦截整页 */
 html:not(.js) .step { opacity: 1; }
+html:not(.js) .intro { display: none; }
 
 /* ============================================================
    断点：768 / 1440
@@ -1045,4 +1119,5 @@ body.intro-open { overflow: hidden; }
   .marquee__track { animation: none; }
   .course-flash { display: none; }
   .cursor-dot { display: none; }
+  .deck-preview { display: none; }
 }
