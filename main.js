@@ -21,6 +21,7 @@
 
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
   const finePointer = window.matchMedia("(pointer: fine)");
+  const wideMQ = window.matchMedia("(min-width: 768px)");
 
   /* ============================================================
      Hero 标题逐字入场（JS 关闭时正文原样可读）
@@ -152,7 +153,8 @@
     const max = doc.scrollHeight - window.innerHeight;
     const p = max > 0 ? doc.scrollTop / max : 0;
     if (progressBar) progressBar.style.transform = "scaleX(" + p + ")";
-    if (reduce.matches) return;
+    // 视差只在桌面跑：移动端每帧写 transform/变量会拖慢滚动
+    if (reduce.matches || !wideMQ.matches) return;
     const y = doc.scrollTop;
     if (heroPhone) {
       heroPhone.style.transform = "translate3d(0," + (y * 0.1) + "px,0) rotate(" + (-3 + y * 0.015) + "deg)";

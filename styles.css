@@ -1067,6 +1067,10 @@ html:not(.js) .intro { display: none; }
 /* 单列布局下标题列不再吸顶，否则会压在下面五张步骤卡上 */
 @media (max-width: 767px) {
   .scene__aside { position: static; }
+  /* 移动端关掉 scroll-snap：吸附会把页面往回拽，翻不到页脚 */
+  html { scroll-snap-type: none; }
+  /* 移动端隐藏首屏装饰色块，避免压住副标题文字 */
+  .hero__decor { display: none; }
 }
 
 @media (max-width: 559px) {
