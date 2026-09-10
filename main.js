@@ -22,6 +22,8 @@
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
   const finePointer = window.matchMedia("(pointer: fine)");
   const wideMQ = window.matchMedia("(min-width: 768px)");
+  // 支持 CSS 滚动时间轴时，进度条交给合成器，JS 不再每帧读 scrollHeight
+  const scrollTimeline = !!(window.CSS && CSS.supports && CSS.supports("animation-timeline: scroll()"));
 
   /* ============================================================
      Hero 标题逐字入场（JS 关闭时正文原样可读）
@@ -149,12 +151,15 @@
   let scrollQueued = false;
 
   function updateScroll() {
-    const doc = document.documentElement;
-    const max = doc.scrollHeight - window.innerHeight;
-    const p = max > 0 ? doc.scrollTop / max : 0;
-    if (progressBar) progressBar.style.transform = "scaleX(" + p + ")";
+    if (progressBar && !scrollTimeline) {
+      const d = document.documentElement;
+      const max = d.scrollHeight - window.innerHeight;
+      const p = max > 0 ? d.scrollTop / max : 0;
+      progressBar.style.transform = "scaleX(" + p + ")";
+    }
     // 视差只在桌面跑：移动端每帧写 transform/变量会拖慢滚动
     if (reduce.matches || !wideMQ.matches) return;
+    const doc = document.documentElement;
     const y = doc.scrollTop;
     if (heroPhone) {
       heroPhone.style.transform = "translate3d(0," + (y * 0.1) + "px,0) rotate(" + (-3 + y * 0.015) + "deg)";
@@ -519,6 +524,13 @@
   let pointer = null;
   let suppressClick = false;
 
+  function meter(label, val) {
+    const n = parseInt(val, 10) || 0;
+    let dots = "";
+    for (let i = 0; i < 4; i++) dots += '<i class="' + (i < n ? "on" : "") + '"></i>';
+    return '<span class="card__meter"><em>' + label + '</em><span class="card__dots">' + dots + "</span></span>";
+  }
+
   function buildDeck() {
     if (!deck) return;
     CARDS.forEach((c, i) => {
@@ -534,7 +546,7 @@
         "</div>" +
         '<h3 class="card__name">' + c.name + "</h3>" +
         '<p class="card__def">' + c.def + "</p>" +
-        '<div class="card__meta">理解难度 ' + c.difficulty + " · 常见度 " + c.common + "</div>" +
+        '<div class="card__meta">' + meter("理解难度", c.difficulty) + meter("常见度", c.common) + "</div>" +
         '<div class="card__prompt">点卡看这一条 <span aria-hidden="true">→</span></div>';
       deck.appendChild(el);
       cardsEl.push(el);
