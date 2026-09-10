@@ -65,7 +65,22 @@ ul, ol { list-style: none; }
 
 .wrap { width: min(100% - 40px, var(--wrap)); margin-inline: auto; }
 
-section[id] { scroll-margin-top: calc(var(--nav-h) + 16px); }
+/* 吸顶偏移统一由 scroll-padding-top 负责（锚点与 scroll-snap 共用）；
+   scroll-margin 会再叠加进 snap 偏移，这里必须归零。 */
+section[id] { scroll-margin-top: 0; }
+
+/* ---- 全屏滚动吸附：每节一屏，导航跳节，滚动时相邻节露一点边 ----
+   用 proximity 而非 mandatory：现场题是靠长滚动跑道实现的，
+   mandatory 会把它强行吸走。 */
+html { scroll-snap-type: y proximity; scroll-padding-top: calc(var(--nav-h) + 2px); }
+.hero, .theater, .scene, .feature, .vault, .download, .faq {
+  min-height: calc(100vh - var(--nav-h));
+  min-height: calc(100svh - var(--nav-h));
+  scroll-snap-align: start;
+}
+.hero, .theater, .vault, .download, .faq {
+  display: flex; flex-direction: column; justify-content: center;
+}
 
 .icon { width: 20px; height: 20px; flex: none; color: var(--ink); stroke: currentColor; }
 
@@ -229,6 +244,26 @@ html.js .hero__title.is-in .hero__line-in {
 .hero__actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 30px; }
 .hero__version { margin-top: 20px; font-family: var(--font-num); font-size: 14px; letter-spacing: .04em; color: var(--ink-2); }
 
+/* 标题下的手绘青柠下划线 */
+.hero__underline {
+  display: block;
+  width: min(280px, 56%);
+  height: 14px; margin-top: 6px;
+  fill: none; stroke: var(--lime); stroke-width: 6; stroke-linecap: round;
+}
+/* 首屏底部的滚动提示 */
+.hero__cue {
+  position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%);
+  display: inline-flex; flex-direction: column; align-items: center; gap: 6px;
+  font-size: 12px; letter-spacing: .18em; color: var(--ink-2); text-decoration: none;
+}
+.hero__cue-line { display: block; width: 2px; height: 24px; background: var(--ink-2); transform-origin: 50% 0; animation: cue-drop 1.7s var(--ease-out) infinite; }
+@keyframes cue-drop {
+  0% { transform: scaleY(0); opacity: 0; }
+  35% { transform: scaleY(1); opacity: 1; }
+  100% { transform: scaleY(1); opacity: 0; }
+}
+
 .hero__media { display: flex; justify-content: center; }
 .phone {
   width: clamp(230px,60vw,312px);
@@ -250,15 +285,16 @@ html.js .hero__title.is-in .hero__line-in {
 .stat__label { font-size: 14px; color: var(--ink-2); }
 
 /* ---- 概念卡剧场 ---- */
-.theater { background: var(--paper); padding: clamp(64px,9vw,120px) 0; }
+.theater { background: var(--paper); padding: clamp(22px,2.4vw,34px) 0; }
+.theater .section-head { margin-bottom: clamp(18px,2.6vw,34px); }
 .section-head { margin-bottom: clamp(40px,6vw,64px); }
 
 /* isolation: isolate 把卡片的 z-index 关在这一层里，
    否则卡片会盖住吸顶导航和微课浮层（曾经的两个线上 bug） */
-.deck-stage { position: relative; isolation: isolate; min-height: clamp(500px,78vw,560px); display: grid; place-items: center; margin-inline: auto; width: min(100%, 640px); touch-action: pan-y; }
+.deck-stage { position: relative; isolation: isolate; min-height: clamp(370px,48vh,460px); display: grid; place-items: center; margin-inline: auto; width: min(100%, 640px); touch-action: pan-y; }
 .deck { position: absolute; inset: 0; }
 .card {
-  width: clamp(280px,84vw,340px);
+  width: clamp(250px,74vw,300px);
   aspect-ratio: 340 / 480;
   padding: 24px;
   display: flex; flex-direction: column;
@@ -525,8 +561,8 @@ html.js .hero__title.is-in .hero__line-in {
   box-shadow: 0 10px 28px rgba(0, 0, 0, .38);
   transition: top .62s var(--ease-spring), box-shadow .5s var(--ease-out);
 }
-/* 抠完图：清晰区上移，给下面的讲解卡腾位置 */
-.shibao.is-lifted .sb__view { top: 26%; box-shadow: 0 14px 34px rgba(0, 0, 0, .42); }
+/* 抠完图：清晰区上移，给下面的讲解卡腾位置（要抬到讲解卡上沿 35% 之上） */
+.shibao.is-lifted .sb__view { top: 20%; box-shadow: 0 14px 34px rgba(0, 0, 0, .42); }
 .sb__scene {
   position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
   transition: opacity .5s var(--ease-out);
@@ -670,6 +706,8 @@ html.js .nav.is-ready .nav__links a:nth-child(3) { transition-delay: .14s; }
 html.js .nav.is-ready .nav__links a:nth-child(4) { transition-delay: .21s; }
 html.js .nav.is-ready .nav__links a:nth-child(5) { transition-delay: .28s; }
 html.js .nav.is-ready .nav__links a:nth-child(6) { transition-delay: .35s; }
+html.js .nav.is-ready .nav__links a:nth-child(7) { transition-delay: .42s; }
+html.js .nav.is-ready .nav__links a:nth-child(8) { transition-delay: .49s; }
 
 /* ---- 编号索引（laxspace）：导航项前面带 01…06 ---- */
 .nav__links { counter-reset: navno; }
@@ -682,20 +720,6 @@ html.js .nav.is-ready .nav__links a:nth-child(6) { transition-delay: .35s; }
   color: var(--muted);
 }
 .nav__links a.is-active::before { color: var(--ink); }
-
-/* ---- 角落 HUD（laxspace）：常驻学习数据 ---- */
-.hud {
-  position: fixed; right: 18px; bottom: 18px; z-index: 55;
-  display: flex; gap: 12px;
-  padding: 9px 14px;
-  background: var(--paper);
-  border: 2px solid var(--ink);
-  border-radius: var(--radius-pill);
-  box-shadow: var(--shadow-sm);
-  font-size: 11px; color: var(--ink-2);
-}
-.hud b { font-family: var(--font-num); font-weight: 900; font-size: 14px; color: var(--ink); margin-right: 3px; }
-@media (max-width: 900px) { .hud { display: none; } }
 
 /* ---- 开屏：纸片从中间撕开（itomdev） ---- */
 .intro__half { position: absolute; inset: 0; background: var(--canvas); z-index: 0; }
@@ -725,11 +749,12 @@ html.js .nav.is-ready .nav__links a:nth-child(6) { transition-delay: .35s; }
 .sb__white { stroke-linejoin: round; stroke-linecap: round; }
 
 /* ---- 藏宝阁：手机比例 + 纸板书架（本站 UI 语言） ---- */
-.vault { background: var(--paper); padding: clamp(64px,9vw,120px) 0; }
+.vault { background: var(--paper); padding: clamp(40px,5vw,68px) 0; }
+.vault .section-head { margin-bottom: clamp(22px,3vw,38px); }
 .case { position: relative; }
 .case__room {
   position: relative;
-  aspect-ratio: 1080 / 2400;
+  aspect-ratio: 1080 / 1620;
   display: flex; flex-direction: column;
   background: linear-gradient(180deg, var(--canvas) 0%, var(--canvas-deep) 100%);
   overflow: hidden;
@@ -750,7 +775,7 @@ html.js .nav.is-ready .nav__links a:nth-child(6) { transition-delay: .35s; }
 /* 书架：纸面柜体 + 墨色搁板，尽量占满手机屏 */
 .case__shelf {
   flex: 1;
-  display: flex; flex-direction: column; justify-content: center;
+  display: flex; flex-direction: column; justify-content: flex-start;
   margin: 12px;
   padding: 14px 14px 16px;
   background: var(--paper);
@@ -977,8 +1002,6 @@ html:not(.js) .intro { display: none; }
    ============================================================ */
 @media (min-width: 768px) {
   body { font-size: 17px; }
-  .nav__links { display: flex; }
-  .nav__burger, .nav__drawer { display: none; }
   .stats__grid { grid-template-columns: repeat(4,1fr); }
   .scene__grid { grid-template-columns: 0.8fr 1.2fr; gap: 64px; }
   .feature { grid-template-columns: 1fr 1fr; gap: 64px; }
@@ -993,6 +1016,8 @@ html:not(.js) .intro { display: none; }
 
 /* 桌面端：hero 改两栏，保证手机进首屏 */
 @media (min-width: 1024px) {
+  .nav__links { display: flex; gap: 22px; }
+  .nav__burger, .nav__drawer { display: none; }
   .hero { padding: clamp(48px,5vw,84px) 0 clamp(48px,5vw,88px); }
   .hero__grid { grid-template-columns: 1.05fr .95fr; gap: clamp(32px,4vw,64px); }
   .hero__media { justify-content: flex-end; }
@@ -1117,6 +1142,7 @@ body.intro-open { overflow: hidden; }
   .reveal, .hero__title .char { opacity: 1; transform: none; }
   .step { opacity: 1; }
   .marquee__track { animation: none; }
+  .hero__cue-line { animation: none; }
   .course-flash { display: none; }
   .cursor-dot { display: none; }
   .deck-preview { display: none; }

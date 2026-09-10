@@ -40,7 +40,10 @@
     <nav class="nav__links" aria-label="主导航">
       <a href="#concept">概念卡</a>
       <a href="#scene">现场题</a>
+      <a href="#feature-shibao">识宝</a>
       <a href="#handbook">台词本</a>
+      <a href="#feature-ai">文艺助手</a>
+      <a href="#vault">藏宝阁</a>
       <a href="#download">下载</a>
       <a href="#faq">常见问题</a>
     </nav>
@@ -56,7 +59,10 @@
     <nav class="nav__drawer-links" aria-label="移动端导航">
       <a href="#concept">概念卡</a>
       <a href="#scene">现场题</a>
+      <a href="#feature-shibao">识宝</a>
       <a href="#handbook">台词本</a>
+      <a href="#feature-ai">文艺助手</a>
+      <a href="#vault">藏宝阁</a>
       <a href="#download">下载</a>
       <a href="#faq">常见问题</a>
       <a class="btn btn--primary" href="https://mhbwtjtchwrasnckoidt.supabase.co/storage/v1/object/public/app-updates/artify-1.0.102.apk">下载安卓版</a>
@@ -74,6 +80,7 @@
       <div class="hero__copy">
         <p class="overline">ARTIFY · 文艺指南</p>
         <h1 class="hero__title" id="heroTitle"><span class="hero__line">在文艺场合，</span><span class="hero__line">不露馅</span></h1>
+        <svg class="hero__underline" viewBox="0 0 320 12" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M3 8C70 3 170 2 317 6"/></svg>
         <p class="hero__sub">文艺指南把每个文艺概念拆成一分钟的微课。一屏只放一个概念，右滑进微课，左滑略过——没有信息流，也没有排名压力。</p>
         <ul class="hero__facts">
           <li><b>现场题</b>三种装法任你挑，不判对错，还会告诉你翻车了怎么补救</li>
@@ -94,6 +101,9 @@
         </div>
       </div>
     </div>
+    <a class="hero__cue" href="#concept" aria-label="往下看，进入概念卡">
+      <span>往下看</span><span class="hero__cue-line" aria-hidden="true"></span>
+    </a>
   </section>
 
   <!-- 数据条：滚入视口时数字从 0 滚到目标 -->
@@ -186,7 +196,7 @@
         </div>
       </article>
 
-      <article class="feature feature--reverse reveal">
+      <article class="feature feature--reverse reveal" id="feature-shibao">
         <div class="feature__copy">
           <p class="overline overline--swatch" style="--sec: var(--yellow)">识宝</p>
           <h3>拍一下，就知道这是什么</h3>
@@ -288,7 +298,7 @@
         </div>
       </article>
 
-      <article class="feature feature--reverse reveal">
+      <article class="feature feature--reverse reveal" id="feature-ai">
         <div class="feature__copy">
           <p class="overline overline--swatch" style="--sec: var(--purple)">文艺助手</p>
           <h3>卡住的时候，先问一句</h3>
@@ -449,12 +459,6 @@
     <a class="btn btn--primary course-cta" id="courseCta" href="#download">去 App 里看</a>
   </div>
 </div>
-
-<aside class="hud" aria-hidden="true">
-  <span><b>1015</b>概念</span>
-  <span><b>1</b>连续</span>
-  <span><b>3</b>收藏</span>
-</aside>
 
 <span class="cursor-dot" id="cursorDot" aria-hidden="true"></span>
 

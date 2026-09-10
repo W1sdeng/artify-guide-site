@@ -55,15 +55,20 @@
     if (nav) requestAnimationFrame(() => nav.classList.add("is-ready"));
     const reveals = $$(".btn--reveal");
     if (reveals.length && "IntersectionObserver" in window) {
+      // 被 clip-path 完全裁掉的元素对 IO 来说是"不可见"的（可见面积为 0），
+      // 自己永远等不到 is-in。所以观察它未被裁的外层容器，命中后再揭开按钮。
       const io = new IntersectionObserver(
         (entries) => {
           entries.forEach((en) => {
-            if (en.isIntersecting) { en.target.classList.add("is-in"); io.unobserve(en.target); }
+            if (!en.isIntersecting) return;
+            const btn = en.target.matches(".btn--reveal") ? en.target : en.target.querySelector(".btn--reveal");
+            if (btn) btn.classList.add("is-in");
+            io.unobserve(en.target);
           });
         },
         { threshold: 0.2 }
       );
-      reveals.forEach((el) => io.observe(el));
+      reveals.forEach((el) => io.observe(el.parentElement || el));
     } else {
       reveals.forEach((el) => el.classList.add("is-in"));
     }
