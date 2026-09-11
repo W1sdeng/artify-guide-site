@@ -1232,4 +1232,24 @@
     }
     toast.addEventListener("click", hide);
   })();
+
+  /* ============================================================
+     藏宝阁卷角：指针越靠近作品右上角，卷角越大
+     ============================================================ */
+  (function () {
+    if (!finePointer.matches || reduce.matches) return;
+    const pieces = $$(".piece");
+    if (!pieces.length) return;
+    pieces.forEach((p) => {
+      p.addEventListener("pointermove", (e) => {
+        const r = p.getBoundingClientRect();
+        const dx = r.right - e.clientX;
+        const dy = e.clientY - r.top;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const peel = Math.max(0, Math.min(1, 1 - dist / 48));
+        p.style.setProperty("--peel", peel.toFixed(3));
+      });
+      p.addEventListener("pointerleave", () => p.style.setProperty("--peel", "0"));
+    });
+  })();
 })();

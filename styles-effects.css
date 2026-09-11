@@ -139,6 +139,7 @@ html.js .reveal.fx-rise.fx-in {
    ------------------------------------------------------------ */
 .piece {
   position: relative;
+  --peel: 0;
 }
 @media (hover: hover) {
   .piece::before,
@@ -147,8 +148,9 @@ html.js .reveal.fx-rise.fx-in {
     position: absolute;
     top: 0;
     right: 0;
-    width: 15px;
-    height: 15px;
+    /* 卷角大小随指针靠近右上角的程度变化（JS 写 --peel 0..1） */
+    width: calc(8px + var(--peel, 0) * 18px);
+    height: calc(8px + var(--peel, 0) * 18px);
     opacity: 0;
     pointer-events: none;
     z-index: 2;
