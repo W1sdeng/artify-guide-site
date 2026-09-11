@@ -196,6 +196,21 @@
     </div>
   </section>
 
+  <!-- 概念长廊：three.js 3D 走廊，滚动向深处穿行；不支持 WebGL / 减动效时回退静态 -->
+  <section class="corridor-sec" id="corridor" aria-labelledby="corridorTitle">
+    <div class="wrap">
+      <header class="section-head reveal">
+        <p class="overline overline--swatch" style="--sec: var(--blue)">概念长廊</p>
+        <h2 id="corridorTitle">一千个概念，一条长廊</h2>
+        <p class="section-sub">往下滚，穿过它们。每一块牌子上，是你想弄懂的一个词。</p>
+      </header>
+      <div class="corridor" id="corridorStage" role="img" aria-label="一条由概念卡构成、可向深处穿行的 3D 长廊">
+        <canvas id="corridorCanvas"></canvas>
+        <p class="corridor__fallback">你的浏览器不支持 3D 展示。</p>
+      </div>
+    </div>
+  </section>
+
   <!-- 功能交替段：左文右图 / 左图右文 / 左文右图 -->
   <section class="features" aria-label="功能">
     <div class="wrap">
@@ -496,5 +511,6 @@
 <script src="main.js"></script>
 <script src="motion.js"></script>
 <script src="effects.js"></script>
+<script type="module" src="three-corridor.js"></script>
 </body>
 </html>

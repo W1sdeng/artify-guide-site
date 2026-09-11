@@ -535,6 +535,20 @@ html.js .hero__title.is-in + .hero__underline path {
 }
 .scene--pinned .steps.is-dealt .step { animation: none; }
 
+/* ---- 概念长廊：three.js 3D 走廊 ---- */
+.corridor-sec { background: var(--paper); padding: clamp(40px,5vw,72px) 0; }
+.corridor {
+  position: relative; width: min(100%, 900px); margin-inline: auto;
+  aspect-ratio: 16 / 9; max-height: 58vh;
+  border: 2px solid var(--ink); border-radius: var(--radius-card);
+  box-shadow: var(--shadow); overflow: hidden;
+  background: linear-gradient(180deg, var(--canvas) 0%, var(--canvas-deep) 100%);
+}
+.corridor canvas { display: block; width: 100%; height: 100%; }
+.corridor__fallback { display: none; margin: 0; padding: 24px; text-align: center; color: var(--ink-2); font-weight: 700; }
+.corridor.is-fallback canvas { display: none; }
+.corridor.is-fallback .corridor__fallback { display: grid; place-items: center; height: 100%; }
+
 /* ---- 功能交替段 ---- */
 .features { background: var(--paper); padding: clamp(64px,9vw,120px) 0; }
 .feature { display: grid; gap: 32px; align-items: center; margin-bottom: clamp(56px,8vw,100px); }
