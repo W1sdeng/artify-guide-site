@@ -568,6 +568,9 @@ html.js .hero__title.is-in + .hero__underline path {
   transition: opacity .5s var(--ease-out) .14s, transform .8s var(--ease-spring) .14s;
 }
 .feature.reveal.is-in .feature__media > * { opacity: 1; transform: none; }
+/* 截图本身用"窗口"遮罩展开（只裁内层图，不裁外框的 ink 底座） */
+html.js .feature__media .shot > img { clip-path: inset(11% 0 11% 0); transition: clip-path .72s var(--ease-out) .18s; }
+html.js .feature.reveal.is-in .feature__media .shot > img { clip-path: inset(0); }
 .feature--reverse .feature__media > * { transform: translateX(-38px) rotate(-2.5deg); }
 .feature--reverse.reveal.is-in .feature__media > * { transform: none; }
 
