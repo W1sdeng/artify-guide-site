@@ -403,11 +403,12 @@
      - 移动端 / 减动效 / 无 IO：退回纵向列表，滚入点亮
      ============================================================ */
   let scenePinned = false;
+  let sceneH = false;   // 移动端横向吸附模式
 
   /* 纵向兜底：越过中线即永久点亮 */
   if ("IntersectionObserver" in window) {
     const stepObs = new IntersectionObserver((entries) => {
-      entries.forEach((en) => { if (en.isIntersecting && !scenePinned) en.target.classList.add("is-lit"); });
+      entries.forEach((en) => { if (en.isIntersecting && !scenePinned && !sceneH) en.target.classList.add("is-lit"); });
     }, { rootMargin: "-45% 0px -45% 0px" });
     $$("[data-step]").forEach((el) => stepObs.observe(el));
   } else {
@@ -422,7 +423,7 @@
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((en) => {
-          if (!en.isIntersecting || reduce.matches || scenePinned) return;
+          if (!en.isIntersecting || reduce.matches || scenePinned || sceneH) return;
           ol.classList.remove("is-dealt");
           void ol.offsetWidth;
           ol.classList.add("is-dealt");
@@ -431,6 +432,39 @@
       { threshold: 0.35 }
     );
     io.observe(ol);
+  })();
+
+  /* 移动端：五步横向吸附，滑动点亮到当前步 */
+  (function () {
+    const vp = $("#scene .scene__viewport");
+    const steps = $$("#scene .step");
+    if (!vp || !steps.length) return;
+    const mq = window.matchMedia("(max-width: 767px)");
+    let raf = null;
+    function light() {
+      raf = null;
+      const center = vp.scrollLeft + vp.clientWidth / 2;
+      let best = 0, bd = Infinity;
+      steps.forEach((el, i) => {
+        const c = el.offsetLeft + el.offsetWidth / 2;
+        const d = Math.abs(c - center);
+        if (d < bd) { bd = d; best = i; }
+      });
+      steps.forEach((el, i) => el.classList.toggle("is-lit", i <= best));
+    }
+    function onScroll() { if (!raf) raf = requestAnimationFrame(light); }
+    function sync() {
+      sceneH = mq.matches;
+      vp.removeEventListener("scroll", onScroll);
+      if (sceneH) {
+        vp.addEventListener("scroll", onScroll, { passive: true });
+        light();
+      } else {
+        steps.forEach((el) => el.classList.remove("is-lit"));
+      }
+    }
+    if (mq.addEventListener) mq.addEventListener("change", sync);
+    sync();
   })();
 
   /* 桌面：钉住 + 横向推进。进度映射到轨道平移量，越过锚点的步骤永久点亮 */

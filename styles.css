@@ -1192,6 +1192,17 @@ html:not(.js) .intro { display: none; }
   html { scroll-snap-type: none; }
   /* 移动端隐藏首屏装饰色块，避免压住副标题文字 */
   .hero__decor { display: none; }
+  /* 现场题五步：纵向堆叠 → 横向吸附滑动的卡片列 */
+  .scene__viewport {
+    overflow-x: auto; overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    margin-inline: -20px; padding: 0 20px 8px;
+    scrollbar-width: none;
+  }
+  .scene__viewport::-webkit-scrollbar { display: none; }
+  .steps { display: flex; flex-wrap: nowrap; gap: 14px; width: max-content; }
+  .step { flex: 0 0 min(78vw, 320px); scroll-snap-align: center; }
 }
 
 @media (max-width: 559px) {
