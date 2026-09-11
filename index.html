@@ -481,7 +481,7 @@
   <span class="course-flash" aria-hidden="true"></span>
   <div class="course-panel">
     <button class="course-close" id="courseClose" type="button" aria-label="关闭微课">
-      <svg class="icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 6l12 12"/><path d="M18 6 6 18"/></svg>
+      <span class="pxgrid" id="courseCloseGrid" aria-hidden="true"></span>
     </button>
     <p class="overline" id="courseField">现场题</p>
     <h3 class="course-name" id="courseName">本真性</h3>
@@ -503,6 +503,14 @@
     <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path class="toast__tick" pathLength="1" d="M4 12.5l5 5 11-12"/></svg>
   </span>
   <span class="toast__body"><b>已解锁</b><span>藏品入阁 · 睡莲</span></span>
+</div>
+
+<!-- 移动端：底栏细条生长菜单（laxspace 式） -->
+<div class="dock" id="dock">
+  <nav class="dock__menu" id="dockMenu" aria-label="底部菜单"></nav>
+  <button class="dock__bar" id="dockBar" type="button" aria-expanded="false" aria-controls="dockMenu">
+    <span class="dock__px" aria-hidden="true"></span><span>菜单</span>
+  </button>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>

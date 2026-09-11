@@ -1061,6 +1061,42 @@
   if (courseCta) courseCta.addEventListener("click", () => closeCourse());
   if (overlay) overlay.addEventListener("click", (e) => { if (e.target === overlay) closeCourse(); });
   window.addEventListener("keydown", (e) => { if (e.key === "Escape") closeCourse(); });
+  /* 9×9 像素点亮钮：构建 X 点阵，悬停时对角扫过点亮 */
+  (function () {
+    const grid = $("#courseCloseGrid");
+    if (!grid) return;
+    const N = 9;
+    for (let r = 0; r < N; r++) {
+      for (let c = 0; c < N; c++) {
+        const i = document.createElement("i");
+        if (r === c || r === N - 1 - c) i.className = "on";
+        i.style.transitionDelay = (r + c) * 9 + "ms";
+        grid.appendChild(i);
+      }
+    }
+    const cells = $$("i", grid);
+    const btn = $("#courseClose");
+    if (btn) {
+      btn.addEventListener("pointerenter", () => cells.forEach((el) => el.classList.add("lit")));
+      btn.addEventListener("pointerleave", () => cells.forEach((el) => el.classList.remove("lit")));
+    }
+  })();
+
+  /* 底栏细条生长菜单：从抽屉克隆链接，点开向上生长（移动端） */
+  (function () {
+    const dock = $("#dock"), bar = $("#dockBar"), menu = $("#dockMenu");
+    if (!dock || !bar || !menu) return;
+    const src = $(".nav__drawer-links");
+    if (src) $$("a", src).forEach((a) => menu.appendChild(a.cloneNode(true)));
+    function close() { dock.classList.remove("is-open"); bar.setAttribute("aria-expanded", "false"); }
+    bar.addEventListener("click", () => {
+      const open = !dock.classList.contains("is-open");
+      dock.classList.toggle("is-open", open);
+      bar.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+    $$("a", menu).forEach((a) => a.addEventListener("click", close));
+  })();
+
   // 焦点陷阱：微课浮层打开时，Tab 只在浮层内循环，不跑到背景
   window.addEventListener("keydown", (e) => {
     if (!overlay || !overlay.classList.contains("is-open") || e.key !== "Tab") return;
