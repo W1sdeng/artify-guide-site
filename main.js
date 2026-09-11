@@ -767,7 +767,13 @@
 
   function updateProgress() {
     if (deckCount) {
-      deckCount.textContent = CARDS[current] ? CARDS[current].idx + " / " + String(CARDS.length).padStart(2, "0") : "";
+      const txt = CARDS[current] ? CARDS[current].idx + " / " + String(CARDS.length).padStart(2, "0") : "";
+      if (deckCount.textContent !== txt) {
+        deckCount.textContent = txt;
+        deckCount.classList.remove("is-roll");
+        void deckCount.offsetWidth;
+        deckCount.classList.add("is-roll");
+      }
     }
     if (deckDots) {
       $$(".dot", deckDots).forEach((d, i) => d.classList.toggle("is-current", i === current));

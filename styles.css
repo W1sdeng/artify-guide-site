@@ -444,6 +444,12 @@ html.js .hero__title.is-in + .hero__underline path {
 
 .deck-progress { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 36px; }
 .deck-count { font-family: var(--font-num); font-weight: 900; font-size: 17px; letter-spacing: .06em; }
+/* 编号翻滚：切换概念卡时数字从下滑入 */
+.deck-count.is-roll { animation: count-roll .42s var(--ease-spring); }
+@keyframes count-roll {
+  from { transform: translateY(58%); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
 .deck-dots { display: inline-flex; gap: 8px; }
 .dot { width: 10px; height: 10px; border: 2px solid var(--ink); border-radius: 50%; background: var(--paper); transition: background var(--dur-press) var(--ease-out); }
 .dot.is-current { background: var(--lime); }
