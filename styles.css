@@ -1035,6 +1035,10 @@ html.js .nav.is-ready .nav__links a:nth-child(7) { transition-delay: .42s; }
 .download__qr { display: flex; flex-direction: column; align-items: center; gap: 12px; }
 .qr-card { padding: 14px; background: var(--paper); border: 2px solid var(--ink); border-radius: var(--radius-card); box-shadow: var(--shadow-lg); }
 .qr-card img { width: clamp(150px,42vw,190px); height: auto; }
+/* 3D 二维码主视觉：组件与静态兜底都叠在方卡里，静态待组件就绪后隐藏 */
+.qr-card--3d { position: relative; width: clamp(190px, 46vw, 232px); aspect-ratio: 1; padding: 8px; }
+.qr-card--3d every-qr-code { position: absolute; inset: 8px; width: auto; height: auto; }
+.qr-card--3d .qr-fallback { position: absolute; inset: 8px; width: auto !important; height: auto; }
 .qr-cap { font-weight: 700; }
 
 .install__steps { display: grid; gap: 16px; margin-top: clamp(44px,6vw,72px); }
