@@ -73,6 +73,12 @@ ul, ol { list-style: none; }
    （只用 contain: layout，不用 paint，避免裁掉外部的 ink 底座） */
 .shot, .card, .faq__item, .install__step, .case, .phone, .deck-preview, .toast { contain: layout; }
 
+/* 低端设备降级：关掉纸纹、跑马灯、光标预览等重效果 */
+html.perf-low .card::after,
+html.perf-low .shot::after { display: none; }
+html.perf-low .marquee__track { animation: none; }
+html.perf-low .deck-preview { display: none; }
+
 /* 吸顶偏移统一由 scroll-padding-top 负责（锚点与 scroll-snap 共用）；
    scroll-margin 会再叠加进 snap 偏移，这里必须归零。 */
 section[id] { scroll-margin-top: 0; }

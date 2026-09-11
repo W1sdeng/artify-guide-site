@@ -25,6 +25,13 @@
   // 支持 CSS 滚动时间轴时，进度条交给合成器，JS 不再每帧读 scrollHeight
   const scrollTimeline = !!(window.CSS && CSS.supports && CSS.supports("animation-timeline: scroll()"));
 
+  // 性能分级：低端设备打上 html.perf-low，各模块据此降级重效果
+  (function () {
+    const mem = navigator.deviceMemory;
+    const cores = navigator.hardwareConcurrency;
+    if ((mem && mem <= 4) || (cores && cores <= 4)) document.documentElement.classList.add("perf-low");
+  })();
+
   /* ============================================================
      Hero 标题逐字入场（JS 关闭时正文原样可读）
      ============================================================ */
@@ -1246,34 +1253,45 @@
   })();
 
   /* ============================================================
-     成就吐司：识宝首次收进藏宝阁时弹出；本机 localStorage 去重
+     成就系统：多种成就，各自 localStorage 去重，共用同一个纸卡吐司
      ============================================================ */
   (function () {
     const toast = $("#toast");
-    const shelf = $("#shelf");
-    if (!toast || !shelf) return;
-    const KEY = "artify-toast-vault";
-    let seen = false;
-    try { seen = localStorage.getItem(KEY) === "1"; } catch (_) {}
+    if (!toast) return;
+    const titleEl = $(".toast__body b", toast);
+    const subEl = $(".toast__body span", toast);
     let hideTimer = null;
     function hide() {
       toast.classList.remove("is-on");
       toast.setAttribute("aria-hidden", "true");
       if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
     }
-    function show() {
-      if (seen) return;
-      seen = true;
-      try { localStorage.setItem(KEY, "1"); } catch (_) {}
+    function unlock(id, title, sub) {
+      const KEY = "artify-ach-" + id;
+      try { if (localStorage.getItem(KEY) === "1") return; localStorage.setItem(KEY, "1"); } catch (_) {}
+      if (titleEl) titleEl.textContent = title;
+      if (subEl) subEl.textContent = sub;
       toast.setAttribute("aria-hidden", "false");
       requestAnimationFrame(() => toast.classList.add("is-on"));
+      if (hideTimer) clearTimeout(hideTimer);
       hideTimer = window.setTimeout(hide, 5200);
     }
-    if ("MutationObserver" in window) {
-      new MutationObserver(() => { if (shelf.classList.contains("is-landed")) show(); })
+    toast.addEventListener("click", hide);
+
+    // 成就 1：识宝首次收进藏宝阁
+    const shelf = $("#shelf");
+    if (shelf && "MutationObserver" in window) {
+      new MutationObserver(() => { if (shelf.classList.contains("is-landed")) unlock("vault", "已解锁", "藏品入阁 · 睡莲"); })
         .observe(shelf, { attributes: true, attributeFilter: ["class"] });
     }
-    toast.addEventListener("click", hide);
+    // 成就 2：首次滚到下载页
+    const dl = $("#download");
+    if (dl && "IntersectionObserver" in window) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((en) => { if (en.isIntersecting) { unlock("download", "看到了", "下载页 · 准备安装"); io.disconnect(); } });
+      }, { threshold: 0.4 });
+      io.observe(dl);
+    }
   })();
 
   /* ============================================================

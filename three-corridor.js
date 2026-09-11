@@ -19,7 +19,10 @@ import * as THREE from "three";
     stage.classList.add("is-fallback");
     return;
   }
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  // 性能分级：低端设备用 1x 像素比，减少 WebGL 负担
+  const lowEnd = document.documentElement.classList.contains("perf-low")
+    || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
+  renderer.setPixelRatio(lowEnd ? 1 : Math.min(window.devicePixelRatio || 1, 2));
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(52, 16 / 9, 0.1, 400);
