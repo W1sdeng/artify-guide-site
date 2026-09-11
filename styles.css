@@ -213,12 +213,13 @@ h3 { font-size: var(--fs-h3); line-height: 1.3; font-weight: 700; }
   position: absolute; left: 0; right: 0; top: 100%;
   background: var(--paper);
   border-bottom: 2px solid var(--ink);
-  transform: translateY(-12px);
+  /* 从汉堡按钮位置圆形展开 */
+  clip-path: circle(0% at calc(100% - 39px) 0);
   opacity: 0;
-  transition: transform var(--dur-enter) var(--ease-out), opacity var(--dur-enter) var(--ease-out);
+  transition: clip-path var(--dur-enter) var(--ease-out), opacity var(--dur-enter) var(--ease-out);
 }
 .nav__drawer[hidden] { display: none; }
-.nav__drawer.is-visible { transform: translateY(0); opacity: 1; }
+.nav__drawer.is-visible { clip-path: circle(150% at calc(100% - 39px) 0); opacity: 1; }
 .nav__drawer-links { display: flex; flex-direction: column; gap: 4px; padding: 16px 20px 24px; }
 .nav__drawer-links a {
   text-decoration: none; font-weight: 700; font-size: 18px;
