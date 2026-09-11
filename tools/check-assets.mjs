@@ -20,6 +20,9 @@ function read(rel) {
 }
 function fail(file, msg) { failures.push(`${file}: ${msg}`); }
 function isExternal(u) { return /^https?:\/\//i.test(u); }
+// 允许的 CDN 白名单（技术路线：GSAP / ScrollTrigger / three 经 jsDelivr 或 unpkg 引入）
+const CDN_ALLOW = [/^https?:\/\/cdn\.jsdelivr\.net\//i, /^https?:\/\/unpkg\.com\//i];
+function allowedExternal(u) { return CDN_ALLOW.some((re) => re.test(u)); }
 
 // 去掉 data: URI 后提取 url(...)
 function cssUrls(css) {
@@ -55,7 +58,11 @@ for (const file of HTML_FILES) {
     while ((m = re.exec(html))) {
       const u = m[1];
       if (u.startsWith("data:")) continue;
-      if (isExternal(u)) { fail(file, `外部资源引用：${u}`); continue; }
+      if (isExternal(u)) {
+        if (allowedExternal(u)) notes.push(`${file}: 允许的 CDN 资源 ${u}`);
+        else fail(file, `外部资源引用：${u}`);
+        continue;
+      }
       if (!existsSync(join(ROOT, u.split(/[?#]/)[0]))) fail(file, `本地资源缺失：${u}`);
     }
   }
@@ -73,7 +80,7 @@ for (const file of CSS_FILES) {
   const css = read(file);
   if (css == null) { fail(file, "文件不存在"); continue; }
   for (const u of cssUrls(css)) {
-    if (isExternal(u)) fail(file, `外部资源引用：${u}`);
+    if (isExternal(u)) { if (allowedExternal(u)) notes.push(`${file}: 允许的 CDN 资源 ${u}`); else fail(file, `外部资源引用：${u}`); }
     else if (!existsSync(join(ROOT, u.split(/[?#]/)[0]))) fail(file, `本地资源缺失：${u}`);
   }
 }

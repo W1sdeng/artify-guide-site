@@ -194,7 +194,8 @@
     const doc = document.documentElement;
     const y = doc.scrollTop;
     // 手机随滚动轻微旋转：单元素 transform，合成器友好，移动端也保留
-    if (heroPhone) {
+    // （GSAP 加载时由 motion.js 用 ScrollTrigger scrub 接管，这里让位）
+    if (heroPhone && !window.gsap) {
       heroPhone.style.transform = "translate3d(0," + (y * 0.1) + "px,0) rotate(" + (-3 + y * 0.015) + "deg)";
     }
     // 装饰色块视差只在桌面：移动端多个元素每帧写 CSS 变量会拖慢滚动
