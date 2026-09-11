@@ -1089,21 +1089,6 @@
     }
   })();
 
-  /* 底栏细条生长菜单：从抽屉克隆链接，点开向上生长（移动端） */
-  (function () {
-    const dock = $("#dock"), bar = $("#dockBar"), menu = $("#dockMenu");
-    if (!dock || !bar || !menu) return;
-    const src = $(".nav__drawer-links");
-    if (src) $$("a", src).forEach((a) => menu.appendChild(a.cloneNode(true)));
-    function close() { dock.classList.remove("is-open"); bar.setAttribute("aria-expanded", "false"); }
-    bar.addEventListener("click", () => {
-      const open = !dock.classList.contains("is-open");
-      dock.classList.toggle("is-open", open);
-      bar.setAttribute("aria-expanded", open ? "true" : "false");
-    });
-    $$("a", menu).forEach((a) => a.addEventListener("click", close));
-  })();
-
   // 焦点陷阱：微课浮层打开时，Tab 只在浮层内循环，不跑到背景
   window.addEventListener("keydown", (e) => {
     if (!overlay || !overlay.classList.contains("is-open") || e.key !== "Tab") return;
