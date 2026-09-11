@@ -24,4 +24,18 @@
       }
     );
   }
+
+  // Phase 1：藏宝阁画作"上色"揭示（paint-reveal 的 2D 近似）
+  // 随滚动从左往右把画"扫"出来，落到位后交给 CSS 的常驻样式
+  gsap.utils.toArray("#shelf .piece img").forEach((img, i) => {
+    gsap.fromTo(
+      img,
+      { clipPath: "inset(0 100% 0 0)" },
+      {
+        clipPath: "inset(0 0% 0 0)",
+        ease: "none",
+        scrollTrigger: { trigger: img, start: "top 92%", end: "top 55%", scrub: 0.5 + i * 0.12 }
+      }
+    );
+  });
 })();
