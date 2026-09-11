@@ -69,6 +69,10 @@ ul, ol { list-style: none; }
 
 .wrap { width: min(100% - 40px, var(--wrap)); margin-inline: auto; }
 
+/* 丝滑收尾：自包含的盒子做布局隔离，减少滚动时的布局/重排范围
+   （只用 contain: layout，不用 paint，避免裁掉外部的 ink 底座） */
+.shot, .card, .faq__item, .install__step, .case, .phone, .deck-preview, .toast { contain: layout; }
+
 /* 吸顶偏移统一由 scroll-padding-top 负责（锚点与 scroll-snap 共用）；
    scroll-margin 会再叠加进 snap 偏移，这里必须归零。 */
 section[id] { scroll-margin-top: 0; }

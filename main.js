@@ -1074,7 +1074,7 @@
         const mx = e.clientX - (r.left + r.width / 2);
         const my = e.clientY - (r.top + r.height / 2);
         btn.style.transform = "translate(" + (mx * 0.16) + "px," + (my * 0.26) + "px)";
-      });
+      }, { passive: true });
       btn.addEventListener("pointerleave", () => { btn.style.transform = ""; });
     });
   }
@@ -1248,7 +1248,7 @@
         const dist = Math.sqrt(dx * dx + dy * dy);
         const peel = Math.max(0, Math.min(1, 1 - dist / 48));
         p.style.setProperty("--peel", peel.toFixed(3));
-      });
+      }, { passive: true });
       p.addEventListener("pointerleave", () => p.style.setProperty("--peel", "0"));
     });
   })();
