@@ -39,6 +39,44 @@ import * as THREE from "three";
     group.add(frame);
   }
 
+  // 概念牌：纸底 + 墨边 + 词，做成 CanvasTexture 贴在平面上
+  function roundRect(g, x, y, w, h, r) {
+    g.beginPath();
+    g.moveTo(x + r, y);
+    g.arcTo(x + w, y, x + w, y + h, r);
+    g.arcTo(x + w, y + h, x, y + h, r);
+    g.arcTo(x, y + h, x, y, r);
+    g.arcTo(x, y, x + w, y, r);
+    g.closePath();
+  }
+  function makeLabel(text) {
+    const c = document.createElement("canvas");
+    c.width = 512;
+    c.height = 192;
+    const g = c.getContext("2d");
+    g.fillStyle = "#FFF9EC";
+    g.strokeStyle = "#252527";
+    g.lineWidth = 10;
+    roundRect(g, 10, 10, c.width - 20, c.height - 20, 30);
+    g.fill();
+    g.stroke();
+    g.fillStyle = "#252527";
+    g.font = "700 62px 'FangYuan','Microsoft YaHei',sans-serif";
+    g.textAlign = "center";
+    g.textBaseline = "middle";
+    g.fillText(text, c.width / 2, c.height / 2 + 4);
+    const t = new THREE.CanvasTexture(c);
+    t.anisotropy = 4;
+    return t;
+  }
+  const WORDS = ["本真性", "惯习", "陌生化", "媒介即讯息", "侘寂", "网络化公众", "虚无主义", "元小说"];
+  for (let i = 0; i < WORDS.length; i++) {
+    const mat = new THREE.MeshBasicMaterial({ map: makeLabel(WORDS[i]), transparent: true });
+    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(5.4, 2.0), mat);
+    mesh.position.set(i % 2 ? 1.7 : -1.7, 0, -i * (N * 7 / WORDS.length) - 12);
+    group.add(mesh);
+  }
+
   function resize() {
     const w = stage.clientWidth || 1;
     const h = stage.clientHeight || 1;
