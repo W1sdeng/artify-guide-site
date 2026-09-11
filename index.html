@@ -540,8 +540,10 @@
   const f = document.querySelector(".qr-fallback");
   const el = document.querySelector("every-qr-code");
   const cap = document.querySelector(".qr-cap");
+  const hasGpu = !!(navigator.gpu && navigator.gpu.requestAdapter);
+  if (cap) cap.textContent = hasGpu ? "点一下，3D 世界收回成二维码" : "此浏览器无 WebGPU，已回退可扫二维码（Chrome/Edge 可看 3D）";
   if (el && cap) {
-    el.addEventListener("every-qrcode-error", () => { cap.textContent = "扫码在手机上打开官网"; }, { once: true });
+    el.addEventListener("every-qrcode-error", () => { cap.textContent = "已回退为可扫二维码"; }, { once: true });
   }
   import("./vendor/every-qrcode/web-component/auto.js").catch(() => {});
   function settle() {
