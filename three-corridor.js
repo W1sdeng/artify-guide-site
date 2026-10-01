@@ -31,10 +31,18 @@ import * as THREE from "three";
   const COLS = [0x92ddd1, 0x92a7ed, 0xf1ce67, 0xe98bcf, 0xcbcbe7];
   const group = new THREE.Group();
   scene.add(group);
-  const N = 26;
+  const N = 34;
   for (let i = 0; i < N; i++) {
+    const col = COLS[i % COLS.length];
+    // 淡色体块：走廊壁不是纯线框，有极淡的颜色面，纵深里才有「房间」的密度
+    const fillMat = new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.11, side: THREE.DoubleSide });
+    const fill = new THREE.Mesh(new THREE.PlaneGeometry(7, 9), fillMat);
+    fill.position.z = -i * 7 - 4.02;
+    fill.position.x = (i % 2 ? 1 : -1) * 0.4;
+    fill.rotation.z = (i % 2 ? 1 : -1) * 0.04;
+    group.add(fill);
     const geo = new THREE.EdgesGeometry(new THREE.BoxGeometry(7, 9, 0.25));
-    const mat = new THREE.LineBasicMaterial({ color: COLS[i % COLS.length], transparent: true, opacity: 0.92 });
+    const mat = new THREE.LineBasicMaterial({ color: col, transparent: true, opacity: 0.92 });
     const frame = new THREE.LineSegments(geo, mat);
     frame.position.z = -i * 7 - 4;
     frame.position.x = (i % 2 ? 1 : -1) * 0.4;
@@ -75,8 +83,9 @@ import * as THREE from "three";
   const WORDS = ["本真性", "惯习", "陌生化", "媒介即讯息", "侘寂", "网络化公众", "虚无主义", "元小说"];
   for (let i = 0; i < WORDS.length; i++) {
     const mat = new THREE.MeshBasicMaterial({ map: makeLabel(WORDS[i]), transparent: true });
-    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(5.4, 2.0), mat);
-    mesh.position.set(i % 2 ? 1.7 : -1.7, 0, -i * (N * 7 / WORDS.length) - 12);
+    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(6.0, 2.25), mat);
+    // 左右交替 + 高低错落：牌子像挂在走廊两侧的作品，不是一排齐刷刷的方块
+    mesh.position.set(i % 2 ? 1.7 : -1.7, i % 3 === 1 ? 0.9 : i % 3 === 2 ? -0.8 : 0, -i * (N * 7 / WORDS.length) - 12);
     group.add(mesh);
   }
 

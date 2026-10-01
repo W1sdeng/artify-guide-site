@@ -411,12 +411,11 @@
      - 移动端 / 减动效 / 无 IO：退回纵向列表，滚入点亮
      ============================================================ */
   let scenePinned = false;
-  let sceneH = false;   // 移动端横向吸附模式
 
   /* 纵向兜底：越过中线即永久点亮 */
   if ("IntersectionObserver" in window) {
     const stepObs = new IntersectionObserver((entries) => {
-      entries.forEach((en) => { if (en.isIntersecting && !scenePinned && !sceneH) en.target.classList.add("is-lit"); });
+      entries.forEach((en) => { if (en.isIntersecting && !scenePinned) en.target.classList.add("is-lit"); });
     }, { rootMargin: "-45% 0px -45% 0px" });
     $$("[data-step]").forEach((el) => stepObs.observe(el));
   } else {
@@ -431,7 +430,7 @@
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((en) => {
-          if (!en.isIntersecting || reduce.matches || scenePinned || sceneH) return;
+          if (!en.isIntersecting || reduce.matches || scenePinned) return;
           ol.classList.remove("is-dealt");
           void ol.offsetWidth;
           ol.classList.add("is-dealt");
@@ -442,40 +441,7 @@
     io.observe(ol);
   })();
 
-  /* 移动端：五步横向吸附，滑动点亮到当前步 */
-  (function () {
-    const vp = $("#scene .scene__viewport");
-    const steps = $$("#scene .step");
-    if (!vp || !steps.length) return;
-    const mq = window.matchMedia("(max-width: 767px)");
-    let raf = null;
-    function light() {
-      raf = null;
-      const center = vp.scrollLeft + vp.clientWidth / 2;
-      let best = 0, bd = Infinity;
-      steps.forEach((el, i) => {
-        const c = el.offsetLeft + el.offsetWidth / 2;
-        const d = Math.abs(c - center);
-        if (d < bd) { bd = d; best = i; }
-      });
-      steps.forEach((el, i) => el.classList.toggle("is-lit", i <= best));
-    }
-    function onScroll() { if (!raf) raf = requestAnimationFrame(light); }
-    function sync() {
-      sceneH = mq.matches;
-      vp.removeEventListener("scroll", onScroll);
-      if (sceneH) {
-        vp.addEventListener("scroll", onScroll, { passive: true });
-        light();
-      } else {
-        steps.forEach((el) => el.classList.remove("is-lit"));
-      }
-    }
-    if (mq.addEventListener) mq.addEventListener("change", sync);
-    sync();
-  })();
-
-  /* 桌面：钉住 + 横向推进。进度映射到轨道平移量，越过锚点的步骤永久点亮 */
+  /* 桌面：钉住 + 横向推进。进度离散映射到「亮哪一步」，平移量连续映射 */
   (function () {
     const scene = $("#scene");
     const frame = scene && $(".scene__frame", scene);
@@ -483,22 +449,30 @@
     const stepsEl = scene && $(".steps", scene);
     if (!scene || !frame || !viewport || !stepsEl) return;
     const steps = $$(".step", stepsEl);
-    const pinnedMQ = window.matchMedia("(min-width: 768px)");
+    if (!steps.length) return;
+    // 只有「够宽 + 有悬停 + 精细指针」才钉住；<=860px 或触屏一律退回纵向列表
+    const pinnedMQ = window.matchMedia("(min-width: 861px) and (hover: hover) and (pointer: fine)");
 
     let maxT = 0;      // 轨道可平移的最大距离
-    let centers = [];  // 每步中心相对轨道起点的位置
+    let centers = [];  // 每步中心，轨道内坐标
+    let anchorX = 0;   // 推进锚点：视口横向中点
     let sceneTop = 0;  // 区块绝对顶部
     let navH = 64;
     let tx = 0;        // 当前平移量
-    let maxLit = -1;
+    let lit = -1;      // 当前点亮的步骤序号
     let queued = false;
     let rQueued = false;
 
+    // 只在启用与尺寸变化时量一次；滚动回调里不再触碰布局
     function measure() {
       if (!scenePinned) return;
+      // .steps 带 will-change: transform，它本身就是 offsetParent，
+      // 所以 offsetLeft 已经是轨道内坐标，不要再减轨道起点。
       centers = steps.map((el) => el.offsetLeft + el.offsetWidth / 2);
+      // 锚点放在视口 42% 处：当前步略偏左，下一步更早探进视野，右半屏不空
+      anchorX = viewport.clientWidth * 0.42;
       // 让最后一步也能推进到锚点：跑道长度 = 末步中心到锚点的距离
-      maxT = Math.max(0, centers[centers.length - 1] - viewport.clientWidth * 0.5);
+      maxT = Math.max(0, centers[centers.length - 1] - anchorX);
       sceneTop = scene.getBoundingClientRect().top + window.scrollY;
       navH = $(".nav") ? $(".nav").offsetHeight : 64;
       scene.style.height = (frame.offsetHeight + maxT) + "px";
@@ -514,15 +488,16 @@
         tx = next;
         stepsEl.style.transform = "translate3d(" + tx + "px,0,0)";
       }
-      const anchor = viewport.clientWidth * 0.5;
-      let best = 0, bd = Infinity;
+      // 离散判定：亮此刻落在锚点上的那一步（只跨段时改 class，不逐帧插值、不改文字）
+      let best = 0;
+      let bd = Infinity;
       for (let i = 0; i < centers.length; i++) {
-        const d = Math.abs(centers[i] + tx - anchor);
+        const d = Math.abs(centers[i] + tx - anchorX);
         if (d < bd) { bd = d; best = i; }
       }
-      if (best > maxLit) {
-        maxLit = best;
-        for (let i = 0; i <= maxLit; i++) steps[i].classList.add("is-lit");
+      if (best !== lit) {
+        lit = best;
+        steps.forEach((el, i) => el.classList.toggle("is-lit", i === best));
       }
     }
 
@@ -531,7 +506,7 @@
       scenePinned = true;
       scene.classList.add("scene--pinned");
       steps.forEach((el) => el.classList.remove("is-lit"));
-      maxLit = -1; tx = 0;
+      lit = -1; tx = 0;
       requestAnimationFrame(() => { measure(); update(); });
     }
 
@@ -541,7 +516,7 @@
       scene.classList.remove("scene--pinned");
       scene.style.height = "";
       stepsEl.style.transform = "";
-      tx = 0; maxLit = -1;
+      tx = 0; lit = -1;
       steps.forEach((el) => el.classList.remove("is-lit"));
     }
 
@@ -562,8 +537,8 @@
       requestAnimationFrame(() => { rQueued = false; measure(); update(); });
     }, { passive: true });
 
-    if (pinnedMQ.addEventListener) pinnedMQ.addEventListener("change", sync);
-    else if (pinnedMQ.addListener) pinnedMQ.addListener(sync);
+    pinnedMQ.addEventListener("change", sync);
+    reduce.addEventListener("change", sync);
 
     sync();
   })();
@@ -1195,13 +1170,19 @@
   }
 
   /* ============================================================
-     概念卡：光标跟随的小卡预览（仅桌面精细指针）
-     - 进入卡组淡入、跟随光标带轻微阻尼；拖拽时让位
+     概念卡：光标跟随的小卡预览
+     - 只在「有悬停 + 精细指针」的桌面创建；触屏设备连元素都不生成
+     - 监听挂在卡组容器上（事件委托），pointermove 只记坐标，位移在 rAF 里 lerp
      ============================================================ */
   (function () {
-    const preview = $("#deckPreview");
     const stage = $(".deck-stage");
-    if (!preview || !stage || !finePointer.matches || reduce.matches) return;
+    const hoverFine = window.matchMedia("(hover: hover) and (pointer: fine)");
+    if (!stage || !hoverFine.matches || reduce.matches) return;
+    const preview = document.createElement("div");
+    preview.className = "deck-preview";
+    preview.id = "deckPreview";
+    preview.setAttribute("aria-hidden", "true");
+    document.body.appendChild(preview);
     let px = 0, py = 0, cx = 0, cy = 0;
     let active = false, shown = false, lastIdx = -1;
 

@@ -245,7 +245,7 @@ async function main() {
       })()`;
       const r = await cdp.send("Runtime.evaluate", { expression: expr, returnByValue: true });
       if (!r.result || r.result.value === false) console.log(`  警告：未找到 ${shot.sel}，跳过 ${shot.name}`);
-      await sleep(700);
+      await sleep(1400); // 等滚入揭示 / 逐条动画播完，避免截到半透明中间帧
       const cap = await cdp.send("Page.captureScreenshot", { format: "png", fromSurface: true, captureBeyondViewport: false });
       const file = join(opts.outDir, `${shot.name}.png`);
       writeFileSync(file, Buffer.from(cap.data, "base64"));
