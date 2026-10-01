@@ -34,7 +34,8 @@
 - 视觉与 App 同源：长春花蓝 `#9FAFF0` 画布、暖纸 `#FFF9EC` 卡片、2px 墨色描边 `#252527`、
   零模糊硬阴影、圆角 16/12/8/999、青柠 `#CBEF72` 主 CTA、弹性缓动 `cubic-bezier(.34,1.56,.64,1)`
 - 全站零 emoji，图标一律内联 SVG（24x24 网格、2px 描边）
-- 纯静态、零构建、无 CDN；动画只用 transform / opacity
+- 纯静态、零构建；CDN 白名单仅 jsDelivr/unpkg：GSAP 3.12.5 + ScrollTrigger、Lenis 1.x（桌面惯性滚动）、three.js 0.160（概念长廊）
+- 动画只用 transform / opacity（标题 scrub 短暂叠加 filter，仅文本节点）；全部动效带 `prefers-reduced-motion` 降级
 
 ## 更新素材
 

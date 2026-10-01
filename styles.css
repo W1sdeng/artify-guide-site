@@ -95,6 +95,10 @@ html { scroll-snap-type: y proximity; scroll-padding-top: calc(var(--nav-h) + 2p
 .hero, .theater, .download, .faq {
   display: flex; flex-direction: column; justify-content: center;
 }
+/* Lenis 接管滚动时关闭桌面吸附：惯性平滑与 proximity 吸附互相打架；移动端保持原生 */
+@media (min-width: 861px) {
+  html.lenis-on { scroll-snap-type: none; }
+}
 
 .icon { width: 20px; height: 20px; flex: none; color: var(--ink); stroke: currentColor; }
 
@@ -107,11 +111,20 @@ html { scroll-snap-type: y proximity; scroll-padding-top: calc(var(--nav-h) + 2p
   color: var(--ink-2);
 }
 h2 { font-size: var(--fs-h2); line-height: 1.12; font-weight: 800; letter-spacing: -.02em; }
-/* 章节标题逐字上浮（JS 切字） */
+/* 章节标题逐字揭示，两条互斥路径：
+   - 无 GSAP：CSS 全程控制（初态沉底藏 → is-splitin 上浮揭出）
+   - 有 GSAP：CSS 不给任何 transform/filter 初值，由 gsap.set 独占——
+     否则 computed 矩阵会把百分比换算成 px 污染 gsap 的解析，词会卡在半途 */
 h2 .word { display: inline-block; overflow: hidden; vertical-align: bottom; }
-h2 .word__in { display: inline-block; transform: translateY(112%); transition: transform .55s var(--ease-spring); transition-delay: calc(var(--wi, 0) * 22ms); }
-h2.is-splitin .word__in { transform: none; }
-html:not(.js) h2 .word__in { transform: none; }
+h2 .word__in { display: inline-block; }
+html:not(.gsap-motion) h2 .word__in {
+  transform: translateY(112%); filter: blur(6px);
+  transition: transform .55s var(--ease-spring), filter .5s var(--ease-out);
+  transition-delay: calc(var(--wi, 0) * 22ms);
+}
+html:not(.gsap-motion) h2.is-splitin .word__in { transform: none; filter: blur(0); }
+html:not(.js) h2 .word__in { transform: none; filter: blur(0); }
+html.gsap-motion h2 .word__in { transition: none; }
 
 /* 区块色块：每个功能区一个专属色，标题旁一枚小色块，形成有节奏的多色块品牌语言 */
 .overline--swatch::before {
@@ -326,7 +339,11 @@ html.js .hero__title.is-in + .hero__underline path {
   100% { transform: scaleY(1); opacity: 0; }
 }
 
-.hero__media { display: flex; justify-content: center; }
+.hero__media { display: flex; justify-content: center; perspective: 1200px; }
+/* 视差 scrub 只碰外层包装；入场翻转作用于内层 #heroPhone，两层互不覆盖 */
+.phone-wrap { will-change: transform; }
+/* 入场等待态：仅 GSAP 路径由 motion.js 加上，时间线启动后由内联样式接管 */
+html.js .phone--wait { opacity: 0; }
 .phone {
   width: clamp(230px,60vw,312px);
   padding: 10px;
@@ -1176,6 +1193,15 @@ html.js .nav.is-ready .nav__links a:nth-child(7) { transition-delay: .42s; }
   box-shadow: var(--shadow-lg);
   transform: translateY(24px) scale(.92); opacity: 0;
 }
+/* ---- FLIP 微课转场：真卡克隆（fixed, z 210 > 浮层 200）飞向面板，落定后面板淡入接管 ---- */
+.card--flip-clone {
+  transform: none !important;       /* 源卡带着 CSS 变量的位移/旋转，克隆必须归零 */
+  transition: none !important;
+  opacity: 1 !important;
+  box-shadow: 0 18px 0 var(--ink);
+}
+.course-overlay--flipped .course-panel { transform: none; opacity: 0; transition: none; }
+.course-overlay--flipped.is-shown .course-panel { opacity: 1; transition: opacity .18s var(--ease-out); }
 .course-overlay.is-open .course-panel {
   transform: none; opacity: 1;
   transition: transform var(--dur-celebrate) var(--ease-spring) 120ms, opacity var(--dur-enter) var(--ease-out) 120ms;

@@ -51,6 +51,7 @@
 
   /* ============================================================
      章节标题逐字揭示：把 main 里的 h2 切成逐字 span，进视口错峰上浮
+     - GSAP 在场时只拆词、不触发：滚动 scrub 由 motion.js 接管
      ============================================================ */
   (function () {
     const heads = $$("main section h2");
@@ -70,6 +71,12 @@
         h.appendChild(w);
       });
     });
+    if (window.gsap && window.ScrollTrigger) {
+      document.documentElement.classList.add("gsap-motion");
+      // 减动效下 motion.js 会整体跳过，scrub 无人接管：标题必须直接就位
+      if (reduce.matches) heads.forEach((h) => h.classList.add("is-splitin"));
+      return;
+    }
     if (reduce.matches || !("IntersectionObserver" in window)) {
       heads.forEach((h) => h.classList.add("is-splitin"));
       return;
@@ -122,6 +129,8 @@
     heroStarted = true;
     const title = $("#heroTitle");
     if (title) requestAnimationFrame(() => title.classList.add("is-in"));
+    // motion.js 监听这个事件接管手机入场（已看过开屏时事件早于其加载，那边有 is-in 状态兜底）
+    window.dispatchEvent(new CustomEvent("hero:in"));
   }
 
   function finishIntro() {
@@ -975,8 +984,13 @@
     }
     flyRaf = requestAnimationFrame(frame);
 
-    // 右滑 = 进这一课（浮层延后一点，让飞出的动画被看见）
-    if (entered && leaving) window.setTimeout(() => openCourse(leaving), 300);
+    // 右滑 = 进这一课（浮层延后一点，让飞出的动画被看见）。
+    // FLIP 起点必须用「甩出前」的位置：等 300ms 后卡片已经飞出屏幕了。
+    if (entered && leaving) {
+      const originRect = el.getBoundingClientRect();
+      const originEl = el;
+      window.setTimeout(() => openCourse(leaving, originRect, originEl), 300);
+    }
   }
 
   function skip() {
@@ -1013,8 +1027,9 @@
   const courseClose = $("#courseClose");
   let lastFocus = null;
 
-  function openCourse(c) {
+  function openCourse(c, originRect, originEl) {
     if (!overlay || !c) return;
+    if (overlay.classList.contains("is-open")) return;   // 飞出后的延时入口与手动入口可能撞车
     lastFocus = document.activeElement;
     if (courseField) courseField.textContent = c.field;
     if (courseName) courseName.textContent = c.name;
@@ -1024,14 +1039,47 @@
     // html 与 body 都要锁，只锁 body 时移动端仍能滚动背景
     document.documentElement.classList.add("no-scroll");
     document.body.classList.add("no-scroll");
-    // 先显示，再触发青柠色块的庆祝动画与面板弹性入场
-    requestAnimationFrame(() => overlay.classList.add("is-open"));
-    if (courseClose) courseClose.focus();
+
+    // FLIP：真卡的克隆从原位飞向微课面板，落定后面板接管。
+    // 无 GSAP / 减动效 → 走原有 flash + 弹性入场。
+    const src = originEl || cardsEl[current];
+    const r0 = originRect || (src && src.getBoundingClientRect());
+    if (!(window.gsap && !reduce.matches && r0 && r0.width > 40)) {
+      requestAnimationFrame(() => overlay.classList.add("is-open"));
+      if (courseClose) courseClose.focus();
+      return;
+    }
+    // --flipped 让面板先就位于终态几何（保持透明），rect 测量才准确；克隆落地后再淡入接管
+    overlay.classList.add("is-open", "course-overlay--flipped");
+    const clone = src.cloneNode(true);
+    clone.className = "card card--flip-clone";
+    clone.removeAttribute("id");
+    clone.setAttribute("aria-hidden", "true");
+    clone.style.cssText =
+      "position:fixed;left:" + r0.left + "px;top:" + r0.top + "px;width:" + r0.width + "px;height:" + r0.height + "px;margin:0;z-index:210;pointer-events:none;";
+    document.body.appendChild(clone);
+    const panel = overlay.querySelector(".course-panel");
+    const settle = () => {
+      if (clone.parentNode) clone.parentNode.removeChild(clone);
+      overlay.classList.add("is-shown");
+      if (courseClose) courseClose.focus();
+    };
+    requestAnimationFrame(() => {
+      if (!panel) { settle(); return; }
+      const r1 = panel.getBoundingClientRect();
+      gsap.to(clone, {
+        x: r1.left - r0.left, y: r1.top - r0.top,
+        scale: r1.width / r0.width,
+        transformOrigin: "0 0",
+        duration: 0.55, ease: "power3.out",
+        onComplete: settle
+      });
+    });
   }
 
   function closeCourse() {
     if (!overlay || !overlay.classList.contains("is-open")) return;
-    overlay.classList.remove("is-open");
+    overlay.classList.remove("is-open", "course-overlay--flipped", "is-shown");
     overlay.setAttribute("aria-hidden", "true");
     document.documentElement.classList.remove("no-scroll");
     document.body.classList.remove("no-scroll");
