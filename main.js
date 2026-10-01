@@ -1026,6 +1026,7 @@
   const courseMeta = $("#courseMeta");
   const courseClose = $("#courseClose");
   let lastFocus = null;
+  let flipClone = null;   // 飞行中的微课克隆；提前关闭时必须清掉
 
   function openCourse(c, originRect, originEl) {
     if (!overlay || !c) return;
@@ -1040,7 +1041,9 @@
     document.documentElement.classList.add("no-scroll");
     document.body.classList.add("no-scroll");
 
-    // FLIP：真卡的克隆从原位飞向微课面板，落定后面板接管。
+    // FLIP：真卡的克隆从原位长成微课面板，落定后面板接管。
+    // 必须动 left/top/width/height 而不是 scale：卡片是细长的（300x424），
+    // 面板是矮宽的（460x430），等比放大会让克隆落定时比面板高出一大截，换装瞬间跳变。
     // 无 GSAP / 减动效 → 走原有 flash + 弹性入场。
     const src = originEl || cardsEl[current];
     const r0 = originRect || (src && src.getBoundingClientRect());
@@ -1058,19 +1061,23 @@
     clone.style.cssText =
       "position:fixed;left:" + r0.left + "px;top:" + r0.top + "px;width:" + r0.width + "px;height:" + r0.height + "px;margin:0;z-index:210;pointer-events:none;";
     document.body.appendChild(clone);
+    flipClone = clone;
     const panel = overlay.querySelector(".course-panel");
     const settle = () => {
       if (clone.parentNode) clone.parentNode.removeChild(clone);
-      overlay.classList.add("is-shown");
-      if (courseClose) courseClose.focus();
+      if (flipClone === clone) flipClone = null;
+      // 飞行中可能已被 Esc/点背景关闭：只对仍开着的浮层接管
+      if (overlay.classList.contains("is-open")) {
+        overlay.classList.add("is-shown");
+        if (courseClose) courseClose.focus();
+      }
     };
     requestAnimationFrame(() => {
       if (!panel) { settle(); return; }
       const r1 = panel.getBoundingClientRect();
       gsap.to(clone, {
-        x: r1.left - r0.left, y: r1.top - r0.top,
-        scale: r1.width / r0.width,
-        transformOrigin: "0 0",
+        left: r1.left, top: r1.top, width: r1.width, height: r1.height,
+        boxShadow: "0 6px 0 #252527",       // 落地时对齐面板的 ink 底座厚度
         duration: 0.55, ease: "power3.out",
         onComplete: settle
       });
@@ -1079,6 +1086,8 @@
 
   function closeCourse() {
     if (!overlay || !overlay.classList.contains("is-open")) return;
+    // 飞行中提前关闭：克隆必须清掉，is-shown 不能留在浮层上（否则下次打开面板会提前穿帮）
+    if (flipClone) { flipClone.remove(); flipClone = null; }
     overlay.classList.remove("is-open", "course-overlay--flipped", "is-shown");
     overlay.setAttribute("aria-hidden", "true");
     document.documentElement.classList.remove("no-scroll");

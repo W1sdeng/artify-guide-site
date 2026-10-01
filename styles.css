@@ -1196,9 +1196,10 @@ html.js .nav.is-ready .nav__links a:nth-child(7) { transition-delay: .42s; }
 /* ---- FLIP 微课转场：真卡克隆（fixed, z 210 > 浮层 200）飞向面板，落定后面板淡入接管 ---- */
 .card--flip-clone {
   transform: none !important;       /* 源卡带着 CSS 变量的位移/旋转，克隆必须归零 */
+  aspect-ratio: auto !important;    /* 宽高由 gsap 逐帧驱动（卡片长成面板），卡片比例必须松开 */
   transition: none !important;
   opacity: 1 !important;
-  box-shadow: 0 18px 0 var(--ink);
+  box-shadow: 0 18px 0 var(--ink);  /* 起飞厚度；落点由 gsap 过渡到面板的 0 6px 0 */
 }
 .course-overlay--flipped .course-panel { transform: none; opacity: 0; transition: none; }
 .course-overlay--flipped.is-shown .course-panel { opacity: 1; transition: opacity .18s var(--ease-out); }
